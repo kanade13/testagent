@@ -224,6 +224,86 @@ def _find_step_index_by_order(plan: Dict[str, Any], order: int) -> Optional[int]
             return i
     return None
 
+# ---- 异步版本的阶段1：支持WebSocket交互 ----
+async def stage1_show_and_confirm_async(client: OpenAI, model: str, plan: Dict[str, Any], log_path: pathlib.Path, context_json: str, prompt_io) -> Dict[str, Any]:
+    """
+    异步版本的阶段1：展示计划并等待确认/编辑
+    """
+    # 通过WebSocket发送计划显示
+    await prompt_io.notify("===== 阶段1：测试执行计划（等待确认/修改） =====")
+    plan_display = json_pretty(plan)
+    await prompt_io.notify(f"生成的测试计划：\n{plan_display}")
+    
+    await prompt_io.notify("\n可用指令：\n"
+                          " - confirm：确认并继续执行\n"
+                          " - edit：编辑特定步骤\n"
+                          " - ask：询问相关问题\n"
+                          " - stop：停止执行")
+
+    while True:
+        # 通过WebSocket询问用户指令
+        user_text = await prompt_io.ask(
+            question="请输入你的指令（阶段1）",
+            key="stage1_command", 
+            choices=["confirm", "edit", "ask", "stop"],
+            default="confirm"
+        )
+        
+        user_text = str(user_text).strip()
+        write_log(log_path, "USER_INPUT_STAGE1", user_text if user_text else "<confirm>")
+        
+        if user_text == "" or user_text.lower() == "confirm":
+            await prompt_io.notify("[确认] 进入执行阶段")
+            return plan  # 视为确认
+
+        cmd = parse_command_with_llm(client, model, user_text, plan, current_step=1, context_json=context_json)
+        op = cmd["op"]
+
+        if op == "confirm":
+            await prompt_io.notify("[确认] 进入执行阶段")
+            return plan
+
+        elif op == "stop":
+            await prompt_io.notify("[停止] 用户取消执行")
+            raise KeyboardInterrupt("用户停止执行。")
+
+        elif op == "ask":
+            # 可能带有 target_step（按步骤号），也可能没有
+            t = cmd.get("target_step")  # None 或 int
+            ans = answer_user_question(
+                client=client,
+                model=model,
+                question=cmd.get("message", ""),
+                plan=plan,
+                context_json=context_json,
+                target_step=t
+            )
+            await prompt_io.notify(f"[答复] {ans}")
+
+        elif op == "edit":
+            t = cmd.get("target_step", 0)
+            edits = cmd.get("edits", {})
+            # 简化：阶段1允许编辑任意步骤（按 order 定位）
+            idx = _find_step_index_by_order(plan, t)
+            if idx is None:
+                await prompt_io.notify(f"[警告] 未找到步骤 {t}")
+                continue
+                
+            plan["steps"][idx].update({k: v for k, v in edits.items() if v is not None})
+            ok, err = validate_plan(plan, PLAN_SCHEMA)
+            if not ok:
+                await prompt_io.notify(f"[校验失败] {err}")
+            else:
+                await prompt_io.notify("[已修改并通过校验]")
+                modified_step = json_pretty(plan["steps"][idx])
+                await prompt_io.notify(f"修改后的步骤：\n{modified_step}")
+
+        elif op in ("skip", "goto"):
+            await prompt_io.notify("[提示] 阶段1仅用于确认/总体编辑，不进行逐步控制。若要跳过/跳转，请进入阶段2后处理。")
+
+        else:
+            await prompt_io.notify("[提示] 请输入更明确的意图（confirm/edit/ask/stop）。")
+
 # ----------- 阶段2：逐步执行（每步前等待确认/可编辑/跳过/跳转/问答/停止）-----------
 def stage2_stepwise_execute(client: OpenAI, model: str, plan: Dict[str, Any],log_path:pathlib.Path,context_json:str) -> None:
     print("\n===== 阶段2：逐步执行 =====")
@@ -323,6 +403,127 @@ def stage2_stepwise_execute(client: OpenAI, model: str, plan: Dict[str, Any],log
             continue
 
     print("\n===== 阶段2结束：已到达计划末尾 =====")
+
+# ---- 异步版本的阶段2：支持WebSocket交互 ----
+async def stage2_stepwise_execute_async(client: OpenAI, model: str, plan: Dict[str, Any], log_path: pathlib.Path, context_json: str, prompt_io) -> None:
+    """
+    异步版本的阶段2：逐步执行
+    """
+    await prompt_io.notify("\n===== 阶段2：逐步执行 =====")
+    # 确保 steps 按 order 升序
+    plan["steps"].sort(key=lambda x: x["order"])
+    i = 0
+    n = len(plan["steps"])
+
+    while 0 <= i < n:
+        step = plan["steps"][i]
+        order = step["order"]
+
+        await prompt_io.notify("\n--- 即将执行的步骤 ---")
+        step_display = json_pretty(step)
+        await prompt_io.notify(f"步骤详情：\n{step_display}")
+        
+        await prompt_io.progress(f"步骤 {order}", f"等待用户确认步骤 {order}")
+
+        # 通过WebSocket询问用户指令
+        user_text = await prompt_io.ask(
+            question=f"你的指令（当前步骤{order}）",
+            key=f"step_{order}_command",
+            choices=["confirm", "skip", "goto", "edit", "ask", "stop"],
+            default="confirm"
+        )
+        
+        user_text = str(user_text).strip()
+        write_log(log_path, f"USER_INPUT_STEP{order}", user_text if user_text else "<confirm>")
+        
+        if user_text == "" or user_text.lower() == "confirm":
+            # 直接确认执行
+            await prompt_io.progress(f"执行步骤 {order}", "正在执行步骤...")
+            ok = execute_step(step)
+            write_log(log_path, f"EXEC_RESULT_STEP{order}", f"success={ok}")
+            if not ok:
+                await prompt_io.notify("[失败] 执行失败")
+                write_log(log_path, f"EXEC_RESULT_STEP{order}", f"success={ok}")
+                continue
+            await prompt_io.notify(f"[成功] 步骤 {order} 执行完成")
+            i += 1
+            continue
+
+        # 解析自然语言为命令
+        cmd = parse_command_with_llm(client, model, user_text, plan, current_step=order, context_json=context_json)
+        op = cmd["op"]
+
+        if op == "confirm":
+            await prompt_io.progress(f"执行步骤 {order}", "正在执行步骤...")
+            ok = execute_step(step)
+            write_log(log_path, f"EXEC_RESULT_STEP{order}", f"success={ok}")
+            if ok:
+                await prompt_io.notify(f"[成功] 步骤 {order} 执行完成")
+                i += 1
+            else:
+                await prompt_io.notify("[失败] 执行失败")
+            continue
+
+        if op == "stop":
+            await prompt_io.notify("[已停止] 用户要求终止")
+            write_log(log_path, f"EXEC_RESULT_STEP{order}", f"用户暂停")
+            return
+
+        if op == "skip":
+            await prompt_io.notify(f"[跳过] 步骤 {order}")
+            write_log(log_path, f"EXEC_RESULT_STEP{order}", f"用户跳过")
+            i += 1
+            continue
+
+        if op == "goto":
+            t = cmd.get("target_step")
+            if not isinstance(t, int):
+                await prompt_io.notify("[提示] 请提供要跳转的目标步骤号 target_step")
+                write_log(log_path, f"EXEC_RESULT_STEP{order}", f"用户跳转失败，未提供目标步骤号")
+                continue
+            idx = _find_step_index_by_order(plan, t)
+            if idx is None:
+                await prompt_io.notify(f"[警告] 未找到步骤 {t}")
+                write_log(log_path, f"EXEC_RESULT_STEP{order}", f"用户跳转失败，未找到步骤 {t}")
+                continue
+            i = idx
+            await prompt_io.notify(f"[跳转] 到步骤 {t}")
+            write_log(log_path, f"EXEC_RESULT_STEP{order}", f"用户跳转到 {t}")
+            continue
+
+        if op == "ask":
+            q = cmd.get("message", "")
+            ans = answer_user_question(client, model, q, plan, step, context_json=context_json)
+            await prompt_io.notify(f"[答复] {ans}")
+            write_log(log_path, f"EXEC_RESULT_STEP{order}", f"用户询问：{q}\n答复：{ans}")
+            continue
+
+        if op == "edit":
+            t = cmd.get("target_step", order)
+            idx = _find_step_index_by_order(plan, t)
+            if idx is None:
+                await prompt_io.notify(f"[警告] 未找到步骤 {t}")
+                write_log(log_path, f"EXEC_RESULT_STEP{order}", f"用户编辑失败，未找到步骤 {t}")
+                continue
+            edits = cmd.get("edits", {})
+            before = deepcopy(plan["steps"][idx])
+            plan["steps"][idx].update({k: v for k, v in edits.items() if v is not None})
+            ok, err = validate_plan(plan, PLAN_SCHEMA)
+            if not ok:
+                await prompt_io.notify(f"[校验失败] {err}\n[回滚] 还原修改。")
+                write_log(log_path, f"EXEC_RESULT_STEP{order}", f"用户编辑步骤 {t} 失败，错误：{err}")
+                plan["steps"][idx] = before
+                continue
+            
+            await prompt_io.notify("[已修改并通过校验]")
+            edited_step = json_pretty(plan["steps"][idx])
+            await prompt_io.notify(f"修改后的步骤：\n{edited_step}")
+            # 修改后一般仍停留在同一步，等待用户再次确认或继续
+            write_log(log_path, f"EXEC_RESULT_STEP{order}", f"用户编辑步骤 {t}，修改内容：{json.dumps(edits, ensure_ascii=False)}")
+            continue
+
+    await prompt_io.notify("\n===== 阶段2结束：已到达计划末尾 =====")
+    await prompt_io.progress("完成", "所有测试步骤已执行完毕")
     
 def _backup_and_save(plan: Dict[str, Any], save_path: pathlib.Path) -> None:
     if save_path.exists():
@@ -380,6 +581,69 @@ def run_test_case(
 
     # 4) 阶段2：逐步执行
     stage2_stepwise_execute(client, model, plan, log_path,context_json=context_json_str)
+
+# ---- 异步版本：支持WebSocket交互 ----
+async def run_test_case_async(
+    case_name: str,
+    case_desc: str,
+    context_json: str,
+    model: str = "qwen3-235b-a22b-instruct-2507",
+    max_retries: int = 3,
+    context: Optional[Dict[str, Any]] = None,
+    prompt_io = None  # AsyncPromptIO 接口
+) -> Dict[str, Any]:
+    """
+    异步版本的测试用例执行函数，支持WebSocket交互
+    """
+    from app.services.prompt_to import AsyncPromptIO
+    
+    if prompt_io is None:
+        raise ValueError("prompt_io is required for async execution")
+    
+    client = OpenAI()
+    # 上下文
+    context = context or load_context_json()
+    context_json_str = json.dumps(context, ensure_ascii=False)
+
+    # 日志文件
+    if case_name == "":
+        case_name = f"case"
+    log_path = pathlib.Path(f"{case_name}_{now_ts()}_log.txt")
+    
+    await prompt_io.progress("生成计划", "正在分析测试用例并生成执行计划...")
+    
+    # 1) 生成计划
+    plan = run_plan_chat(
+        case_name=case_name,
+        case_desc=case_desc,
+        context_json=context_json_str,
+        model=model,
+        max_retries=max_retries
+    )
+    
+    # 2) 校验 & 保存
+    ok, err = validate_plan(plan, PLAN_SCHEMA)
+    if not ok:
+        error_msg = f"生成的计划不符合 SCHEMA：{err}"
+        await prompt_io.notify(f"[错误] {error_msg}")
+        raise ValueError(error_msg)
+
+    write_log(log_path, "INIT_PLAN", json_pretty(plan))
+    
+    # 3) 阶段1：展示计划并等待确认/编辑
+    await prompt_io.progress("计划确认", "显示生成的测试计划，等待用户确认或编辑...")
+    plan = await stage1_show_and_confirm_async(client, model, plan, log_path, context_json_str, prompt_io)
+    
+    # 将type改为2
+    plan["type"] = 2
+    write_log(log_path, "EDITED_PLAN_AFTERSTAGE1", json_pretty(plan))
+    
+    await prompt_io.progress("开始执行", "进入阶段2：逐步执行测试计划...")
+    
+    # 4) 阶段2：逐步执行
+    await stage2_stepwise_execute_async(client, model, plan, log_path, context_json_str, prompt_io)
+    
+    return {"ok": True, "plan": plan, "message": "测试执行完成"}
 
 # ---- 直接运行示例 ----
 if __name__ == "__main__":
