@@ -1,0 +1,44 @@
+
+[20251003-174629] INIT_PLAN
+{
+  "case_name": "Stress_SteelNormadDX12_PXA_240min_Window",
+  "case_desc": "利用PXA工具进行3DMark的SteelNormadDX12场景的Stress测试，用窗口模式，测试时长240分钟",
+  "type": 1,
+  "steps": [
+    {
+      "order": 1,
+      "action": "设置压力测试模式并重启",
+      "tool": "AutoSet",
+      "params": "-stress -Restart",
+      "note": "对应上下文条目：Set Stress Mode，理由：统一设置测试机为Stress模式，并自动重启"
+    },
+    {
+      "order": 2,
+      "action": "安装 SystemInfo 工具",
+      "tool": "SystemInfoInstall",
+      "params": "/ID SystemInfo",
+      "note": "对应上下文条目：Install Systeminfo，理由：为后续硬件信息采集和稳定性监控做准备"
+    },
+    {
+      "order": 3,
+      "action": "安装 3DMark 测试工具",
+      "tool": "3DMarkInstall",
+      "params": "/ID 3DMark",
+      "note": "对应上下文条目：Install 3DMark，理由：PXA运行3DMark场景前需确保工具已安装"
+    },
+    {
+      "order": 4,
+      "action": "重启系统以应用配置",
+      "tool": "SxPowerTest",
+      "params": "--TestFunction Wb --TestTimes 1 --CountDownTime 10 --SleepTime 60 --CheckDeviceMode Nothing /X_SkipShutdown",
+      "note": "对应上下文条目：Reboot，理由：确保所有设置和安装生效"
+    },
+    {
+      "order": 5,
+      "action": "使用PXA运行3DMark SteelNormadDX12场景的压力测试，持续240分钟，窗口模式",
+      "tool": "PXA",
+      "params": "/Job 3DMarkStress SteelNormadDX12.db",
+      "note": "对应上下文条目：Stress_SteelNormadVulkan_PXA_240min，理由：语义对齐至相同Job类型，仅更换配置文件为SteelNormadDX12.db"
+    }
+  ]
+}

@@ -1,0 +1,1850 @@
+{ 
+  "tools": {
+    "CinebenchR20Install": {
+      "工具描述": "\"description\": \"自动安装 Cinebench R20 处理器渲染基准测试工具；返回 0 表示安装成功，非 0 为失败码。当测试步骤出现‘Install CinebenchR20’时执行。\" input:: \"要安装的工具 ID，与 /ID 参数对应，固定值 CinebenchR20\""
+    },
+    "CinebenchR23Install": {
+      "工具描述": "\"description\": \"自动安装 Cinebench R23 处理器渲染基准测试工具；返回 0 表示安装成功，非 0 为失败码。当测试步骤出现‘Install CinebenchR23’时执行。\" input:: \"要安装的工具 ID，与 /ID 参数对应，固定值 CinebenchR23\""
+    },
+    "BurnIn10Install": {
+      "工具描述": "\"description\": \"安装指定版本的 BurnInTest 10（BurnIn10）；返回 0 表示安装成功，非 0 为失败码。当测试步骤出现‘BurnIn10 Install’时执行。\" input: \"要安装的版本号，与 /V 参数对应，如： 10.2.1015.0\","
+    },
+    "BurnInTestStress": {
+      "工具描述": "\"description\": \"运行 BurnInTest 压力测试,可指定时间{time}分钟；返回 0 表示测试通过，非 0 为失败码。当测试步骤出现‘BurnIn Test 120 分钟’时执行。\" input:\"压力测试时长（分钟）可变，与 TestTime 参数对应，如： TestTime=“120\"，"
+    },
+    "LUTC": {
+      "工具描述": "\"description\": \"循环调用PassMark 全项测试（PassMark_ALL），含日志与结果汇总；返回 0 表示全部循环通过，非 0 为任一循环失败。当测试步骤出现‘运行 PassMark 3 次’时调用。\" input：\"测试任务名，与 /Job 参数对应，固定值 PassMark_ALL\"，\"循环次数，与 /S 参数对应，固定 3\"，\"循环间隔(秒)，与 /I 参数对应，固定 15\"，\"是否记录详细日志，与 /L 参数对应，固定 true\","
+    },
+    "OSAgingTool": {
+      "工具描述": "\"description\": \"执行S3/S4/WB/Cb/Fb/MS循环测试：测试功能 {item}，循环{TestTimes}次，倒计时 {CountDownTime}秒，睡眠{SleepTime}秒，检查全部设备，忽略列出的虚拟/外设驱动{IgnoredDevices_list}；返回 0 表示全部循环通过，非 0 为失败码。当测试步骤出现‘S4 测试 500 次’时执行。\" input:\"测试功能，S3/S4/WB/CB/FB/MS\", \"循环次数，任意正整数\", 倒计时(秒)，60/90\", \"忽略的设备列表，与 --IgnoredDevices 对应, 各Device名称用逗号隔开",
+      "Unnamed: 6": "倒计时 {CountDownTime} 秒，重启后等待 {SleepTime}秒"
+    },
+    "PMSWitchEx": {
+      "工具描述": "\"description\": \"将PC电源模式切换为高性能模式或者平衡模式；返回 0 表示切换成功，非 0 为失败码。当测试步骤出现‘设备 Performance Mode’时执行。\", input：\"目标电源模式，与 -set {mode}参数对应，值 performance或者balance\","
+    },
+    "RemoveMicrosoftProgram": {
+      "工具描述": "\"description\": \"批量移除指定 Microsoft 软件：MS 365 App、OneNote、Visual C++ 运行库、Windows Desktop Runtime 等；返回 0 表示全部卸载成功，非 0 为失败码。当测试步骤出现‘remove microsoft software’或调用 RemoveMicrosoftProgram 且带 -r 时执行。\", input：null"
+    },
+    "UninstallTeams": {
+      "工具描述": "\"description\": \"卸载指定的 Microsoft UWP/Store 应用：支持 OneDrive 与 Teams等；返回 0 表示卸载成功，非 0 为失败码。当测试步骤出现‘Uninstall OneDrive app’或‘Uninstall Microsoft Teams UWP app’时调用，根据 {app_name} 自动匹配。\", input：\"要卸载的应用名称，与 /name {app_name}参数对应\"，例如：/name \"Teams\"."
+    },
+    "SetBrightness": {
+      "工具描述": "\"description\": \"将系统屏幕亮度设置为指定{value}值；返回 0 表示设置成功，非 0 为失败码。当测试步骤出现‘设置系统中屏幕的亮度’时执行。\", input:\"亮度百分比，与 /Brightness {value}参数对应，范围 0-100，默认：82\","
+    },
+    "SetComputerVolume": {
+      "工具描述": "\"description\": \"设置系统默认声卡音量{volum}大小；返回 0 表示设置成功，非 0 为失败码。当测试步骤出现‘设置笔记本默认声卡的音量大小’时执行。\", input： \"音量级别，与 /Volum {volum}参数对应，范围 0-100，例：0 表示静音\","
+    },
+    "ChangeOSBackgroundBattery": {
+      "工具描述": "\"description\": \"将系统桌面壁纸设置为指定图片 {file}；返回 0 表示设置成功，非 0 为失败码。当测试步骤出现‘设置壁纸 1-Think_White.jpg’时执行。\", input: \"壁纸文件名，与 /F {file}参数对应，固定值 1-Think_White.jpg\","
+    },
+    "DeviceNetRequest": {
+      "工具描述": "\"description\": \"通过 PDU 直接对测试机执行硬断电或硬上电,需要传入对应{Json_config}；返回 0 表示指令发送成功，非 0 为失败码。当测试步骤出现‘PDU_direct_off 直接关’或‘PDU_direct_on 直接开’时调用，根据 action 字段选择 poweroff/poweron。\", input:\"PDU 动作：poweroff 对应直接关，poweron 对应直接开\", 需要传入对应的json配置，如：{\"testUnitUuid\":\"4899fbed58f\", \"times\":0, \"parentTestModelOperationUuid\":\"e0eeb774579f3788\", \"action\":\"poweron\", \"testModelNodeUuid\":\"7460c72717877d7\", \"testTaskCode\":\"TT200037\", \"controlCmd\":\"Direct\", \"cancel\":0, \"messageUuid\":\"5656565\", \"FW\":\"1\", \"ctrlCmdType\":\"0\", \"timing\":\"1634802625\" }"
+    },
+    "SetPowerMode": {
+      "工具描述": "\"description\": \"设置指定{power_mode} Windows 系统电源模式；返回 0 表示成功，非 0 为失败码。当测试步骤出现‘Set System PowerMode’或调用 SetPowerMode 时执行。\", input:\"电源模式，与 /P {power_mode}参数对应，固定值 BestPowerEfficienct\","
+    },
+    "ChangeSystemDPI": {
+      "工具描述": "\"description\": \"将系统 DPI 缩放改为 {value}指定DPI；返回 0 表示成功，非 0 为失败码。当测试步骤出现‘Change System DPI to 100%’或调用 ChangeSystemDPI 时执行。\", input:\"DPI 设置值，与 /V {value}参数对应，固定值 New（工具内部映射为 100%）\""
+    },
+    "CheckBatteryLevel": {
+      "工具描述": "description\": \"判断电池电量是否大于指定最小值{value}（单位 %）；返回 0 表示电量达标，非 0 为低于阈值或无法读取。当测试步骤出现‘判断电池电量是否在一定范围内’或调用 CheckBatteryLevel 时执行。\", input：\"电量下限百分比，与 /Min {value}参数对应，范围 0-100，例：100\","
+    },
+    "PlayLocalVideo": {
+      "工具描述": "\"description\": \"使用 Media Player 循环播放本地预置视频；返回 0 表示开始播放成功，非 0 为失败码。当测试步骤出现‘Play Local Video with MP’或调用播放本地视频时执行。\" input：\"是否全屏播放，与 -S {screenvalue}参数对应，固定： Yes或No\","
+    },
+    "CPUUsage": {
+      "工具描述": "\"description\": \"实时抓取 CPU 使用率并自动生成折线曲线图，抓取频率{duration}；返回 0 表示抓取与绘图成功，非 0 为失败码。当测试步骤出现‘抓取 CPU 使用率并绘制曲线’或调用 CPUUsage 时执行。\", input：\"采样时长（秒），与 /TestDuration {duration}参数对应，最小 1 s，默认 5 s\","
+    },
+    "ACinAutoOnWrap": {
+      "工具描述": "\"description\": \"运行 ACin_auto_on.exe 适配器插入检测脚本并返回结果；返回 0 表示通过，非 0 为失败码。当测试步骤出现‘run ACin_auto_on.exe and pass the result’时执行。\", input：\"固定参数 -r\","
+    },
+    "ChangeLanStatus": {
+      "工具描述": "\"description\": \"启用或禁用板载有线网卡；返回 0 表示操作成功，非 0 为失败码。当测试步骤出现‘Enable LAN’或‘Disable LAN’时调用，根据 status 字段自动选择 Enable/Disable。\", input：\"目标状态：与 /S {status} 参数对应，Enable 对应启用，Disable 对应禁用\""
+    },
+    "BatteryCapacityDetectControl": {
+      "工具描述": "\"description\": \"对电池执行{action}放电或充放电循环监测：检测目标值{target_percent}，监测频率{interval_sec}；返回 0 表示达到目标电量，非 0 为失败码。当测试步骤出现‘Battery life 放电电池监测’或‘Battery life 充放电电池监测’时调用，根据 action 选择 DisCharge/Charge。\", input：\"监测类型：/A {action} DisCharge 仅放电，Charge 为完整充放电\" \"目标电量百分比，与 /P {target_percent}参数对应， 范围 0-600\",\"采样间隔(秒)，与 /T {interval_sec}参数对应，最小 1, 默认60\","
+    },
+    "BatteryLifeCollectionLog": {
+      "工具描述": "\"description\": \"默认从 C 盘根目录抓取电池寿命日志文件 batterylife.log 并自动上传至测试平台；返回 0 表示上传成功，非 0 为失败码。当测试步骤出现‘抓取电池寿命日志文件 batterylife.log 文件上传到平台’或调用 BatteryLifeCollectionLog 时执行。\", input：null"
+    },
+    "AutoPreload.exe": {
+      "工具描述": "name:\"preload_image\" description:给测试安装操作系统和驱动，调用后无stdout/stderr，仅返回0表示安装成功，非0为安装失败。当用户说“给测试机Preload系统”“Preload Image”等时调用，若文件名非.dat或者路径不可读，同样返回非0 input：本地AOD文件完整路径或者可下载的AOD路径，如：‘c:\\tmp\\pureos.dat’ output: 0,preload成功，其他返回值失败"
+    },
+    "ParsingDMITable": {
+      "工具描述": "name:\"parse_dmi_table\" description: \"解析专用 Excel「DMI table.xlsx」，返回 familyname 与 mtcode 一一对应的列表。当用户上传或提及该文件时调用；若工作簿缺失、列名不符或为空，返回空数组。\", input: 本地完整路径或者下载链接,例如：c:\\tmp\\dmi table.xlsx output:\"每条仅含 familyname 与 mtcode，例如 [{\\\"familyname\\\":\\\"IdeaPad L340-15API\\\",\\\"mtcode\\\":\\\"81LW\\\"}]\","
+    },
+    "SetDNSforvLab": {
+      "工具描述": "description: \"为 vLab 测试机配置 DNS 与 IP，使其能连通外网；返回 0 表示成功，非 0 为失败码。当测试步骤出现‘设置网络连接互联网’ input:\"静态 IP 地址，与脚本参数 --Ip 对应，例如 100.100.231.22\""
+    },
+    "CheckSNTool": {
+      "工具描述": "decription：\"检查测试机 SN 序列号是否合法；返回 0 表示 SN 正常，非 0 为异常或无法读取。当测试步骤出现‘检查测试机 SN 号是否正常’或者检查SN’时调用 input:\"目标类型参数，与命令行 -T 对应，固定值 LNB\""
+    },
+    "LNBWULvar": {
+      "工具描述": "\"description\": \"刷新测试机 DMI 中的 FamilyName 与 MTCode；返回 0 表示刷新成功，非 0 为失败。当测试步骤出现‘刷新 FamilyName 和 MTCode’ 时调用。\" input:\"新 FamilyName，与 --FamilyName 对应，例：IdeaPad L340-15API\",\"新 MTCode，与 --MTCode 对应，例：81LW\""
+    },
+    "SxPowerTest": {
+      "工具描述": "\"description\": \"通过工具调用一次重启：倒计时 10 秒，重启后等待 30 秒，不校验 DeviceMode。返回 0 表示整个重启流程成功，非 0 为失败码。当测试步骤出现‘重启’或调用 SxPowerTest 且 TestFunction 为 Wb 时自动调用。\","
+    },
+    "MDAVTTest": {
+      "工具描述": "\"description\": \"调用 MDA自动化测试套件；返回 0 表示全部测试通过，非 0 为失败。当测试步骤出现‘调用 MDA测试’或‘MDA Test’时调用。\","
+    },
+    "AllMDAReportResult": {
+      "工具描述": "\"description\": \"汇总 MDAVT 产生的所有 MDA 报告，生成总体结果。当测试步骤出现‘汇总 MDA 报告’时调用；返回 0 表示汇总成功，非 0 为失败\", input:\"MDA 报告所在目录，与 -F 参数对应，例如 'C:\\\\AutoWU'\""
+    },
+    "checkMDAReport": {
+      "工具描述": "\"description\": \"校验指定目录下的 MDA 报告是否全部Pass；返回 0 表示全部Pass，非 0 为异常或存在Fail项。当测试步骤出现‘检查 MDA 报告’时调用。\", input:\"MDA 报告所在目录，与 -F 参数对应，例如 'C:\\\\AutoWU'\""
+    },
+    "CheckIPConnection.exe": {
+      "工具描述": "\"description\": \"校验测试机能否连通指定域名；返回 0 表示网络连通，非 0 为连接失败。当测试步骤出现‘检查网络连接’时调用。\", input：\"待检测域名，与 /D 参数对应，例如 ngspms.lenovo.com\","
+    },
+    "DownloadWebSourcefile": {
+      "工具描述": "\"description\": \"从 SPMS 下载指定项目的 Driver Source 文件包；返回 0 表示下载成功，非 0 为失败。当测试步骤出现‘下载 Driver Source file’时调用。\", input：\"SPMS 项目名称，与 -n 参数对应，例：\\\"ThinkPad T14\\\"\"\"SPMS 登录账号，与 -u 参数对应\"，\"SPMS 登录密码，与 -p 参数对应\""
+    },
+    "UnzipWebSourcefiles": {
+      "工具描述": "\"description\": \"自动解压已下载的 Driver Source 文件包（默认位于工具预设目录）；返回 0 表示解压成功，非 0 为失败码。当测试步骤出现‘解压 Driver Source file’时调用\","
+    },
+    "BuildWebISSfile": {
+      "工具描述": "description\": \"将已解压的 Driver Source 文件打包成 Web 安装器（*.exe）；返回 0 表示打包成功，非 0 为失败码。当测试步骤出现‘打包 web exe 文件时调用。\","
+    },
+    "DownloaduploadwebEXE": {
+      "工具描述": "\"description\": \"下载指定项目已生成并上传的 Driver Web EXE 文件；返回 0 表示下载成功，非 0 为失败码。当测试步骤出现‘下载 Driver Web Exe 文件’时调用。\", input：\"项目名称日期文件夹名，与 /pd 参数对应，格式示例：\\\"ThinkPadT14_20250625\\\"\""
+    },
+    "InstallWebExe": {
+      "工具描述": "\"description\": \"静默安装已下载的 Driver Web Exe 驱动包；返回 0 表示安装成功，非 0 为失败码。当测试步骤出现‘安装 Driver Web Exe 文件’时调用。\","
+    },
+    "CheckWebDriverVersion": {
+      "工具描述": "\"description\": \"检查当前系统已安装的 Web Driver版本号；返回 0 表示获取成功，非 0 为失败码，并在 stdout 中输出版本信息。当测试步骤出现‘检查 Web Driver 版本’时调用。\","
+    },
+    "CheckWindowsLogo": {
+      "工具描述": "\"description\": \"校验已安装驱动是否全部通过 Microsoft Windows Hardware Quality Lab（WHQL）认证；返回 0 表示所有驱动均带有效 Logo，非 0 为存在未认证或签名失败项。当测试步骤出现‘检查 Driver Windows Logo’时调用。\", input：\"目标 Windows 版本标签，与 /c 参数对应，例如 21H2\","
+    },
+    "AutoSet": {
+      "工具描述": "\"description\": \"统一设置测试机运行模式：支持 Stress 模式或 Performance 测试模式（含 TPG、音量、亮度、TestMode 等），设置完成后均自动重启。返回 0 表示成功，非 0 为失败码。当测试步骤出现‘设置 Stress Mode’或‘设置 Performance Test Settings’时调用，根据 mode 字段自动下发对应参数。\", input：\"要切换的测试模式：stress 仅压力模式；performance 会同时启用 TPG、音量 10、亮度 88、TestMode\""
+    },
+    "SystemInfoInstall": {
+      "工具描述": "\"description\": \"安装或注册 SystemInfo 工具；返回 0 表示安装成功，非 0 为失败码。当测试步骤出现‘安装 Systeminfo’时调用。\", input:\"要安装的工具 ID，与 /ID 参数对应，固定值 SystemInfo\","
+    },
+    "3DMarkInstall": {
+      "工具描述": "\"description\": \"安装并注册 3DMark 基准测试工具；返回 0 表示安装成功，非 0 为失败码。当测试步骤出现‘安装 3DMark’时调用。\", input：\"要安装的工具 ID，与 /ID 参数对应，固定值 3DMark\","
+    },
+    "PXA": {
+      "工具描述": "\"description\": \"Stress和单双拷测试工具，通过Job 类型和配置文件来调用对应场景测试； 测试项全量命令行： CPU单烤：/Job CPU_Single GPU单烤：/Job GPU_Single 双烤：/Job CGTT Customer CPU单烤：/Job CPU_Single_Customer Customer GPU单烤：/Job GPU_Single_Customer Customer 双烤：/Job CGTT_Customer TAT Stress:/Job TATStress TCT Stress:/Job TCTStress R20:/Job CinebenchR20 /bypass 3Dmark Timespy Graphic:  /Job UL3DMark /bypass Disk：/Job CrystalDiskMark /bypass 3Dmark stress：/Job 3DMarkStress 加配置文件 PXA Quict Test: /Suittype 6 /Job xxxx 返回 0 表示测试通过，非 0 为失败码。当测试步骤出现‘用窗口模式运行 FireStrike 240 分钟’或GPU单拷时调用。\", input： \"PXA 任务名称，与 /Job 参数对应，外加配置文件data.db，如/Job GPU_Single 或者  /Job 3DMarkStress NightRaid.db或者 /Job 3DMarkStress SteelNormadVulkan.db或者 /Job 3DMarkStress Solarbay.db或者 /Job 3DMarkStress SteelNormadDX12.db\","
+    },
+    "LvarMBV": {
+      "工具描述": "\"description\": \"启用测试的 MFG Mode；返回 0 表示设置成功，非 0 为失败码。当测试步骤出现‘Enable MFG Mode’或打开MFG Mode 时调用。\", input：固定参数为 /w /mfgmode /c \\\"M\\\""
+    },
+    "OSTestModel": {
+      "工具描述": "\"description\": \"打开 Windows Test Mode（测试模式）；返回 0 表示成功，非 0 为失败码。当测试步骤出现‘打开 TestMode’时调用。\", input：\"操作类型，固定为 Open（对应 /A Open）\","
+    },
+    "UnitInfoCollector": {
+      "工具描述": "\"description\": \"收集测试机软件硬件信息（CPU、内存、主板、BIOS、硬盘、显卡，驱动、软件版本等）到本地日志；返回 0 表示收集成功，非 0 为失败码。当测试步骤出现‘收集硬件软件信息’时调用。\","
+    },
+    "InstallFurmark": {
+      "工具描述": "\"description\": \"自动安装 FurMark 显卡压力测试工具；返回 0 表示安装成功，非 0 为失败码。当测试步骤出现‘安装 Furmark’时调用。\", input：\"要安装的工具 ID，与 /ID 参数对应，固定值 Furmark\","
+    },
+    "NVGPUMonInstall": {
+      "工具描述": "\"description\": \"自动安装 NVIDIA GPU 监控工具 GPUMon；返回 0 表示安装成功，非 0 为失败码。当测试步骤出现‘安装 GPUMon’时调用。\", input：\"要安装的工具 ID，与 /ID 参数对应，固定值 NVGPUMon\","
+    },
+    "LenovoPcMangerOnOff": {
+      "工具描述": "\"description\": \"关闭 Lenovo PC Manager 进程及相关服务；返回 0 表示关闭成功，非 0 为失败码。当测试步骤出现‘关闭 Lenovo PcManager’调用  input:\"控制开关，固定值 Off（对应 -S Off）\""
+    },
+    "IPTATinstall": {
+      "工具描述": "\"description\": \"自动安装 Intel IPTAT（Platform Test and Assessment Tool）；返回 0 表示安装成功，非 0 为失败码。当测试步骤出现‘安装 Intel IPTAT’时调用。\" input:\"要安装的工具 ID，与 /I 参数对应，固定值 PTAT\""
+    },
+    "SystemDeckInstall": {
+      "工具描述": "\"description\": \"自动安装 System Deck 工具；返回 0 表示安装成功，非 0 为失败码。当测试步骤出现‘安装 System Deck’时调用。\", input:\"要安装的工具 ID，与 /ID 参数对应，固定值 SystemDeck\""
+    },
+    "PassMarkInstall": {
+      "工具描述": "\"description\": \"自动安装 PassMark 性能测试套件；返回 0 表示安装成功，非 0 为失败码。当测试步骤出现‘安装 PassMark’时调用。\" input:\"要安装的工具 ID，与 /ID 参数对应，固定值 PassMark\""
+    },
+    "PassmarkRegisterv11": {
+      "工具描述": "\"description\": \"为以安装的PassMark性能测试套件调用注册；返回 0 表示注册成功，非 0 为失败码。当测试步骤出现‘注册 Passmark’时调用。\","
+    },
+    "CollectHardwareSoftwareInfo": {
+      "工具描述": "\"description\": \"收集整机硬件与已安装软件信息并生成汇总日志；返回 0 表示收集成功，非 0 为失败码。当测试步骤出现‘收集硬件信息’时调用。\","
+    }
+  },
+"cases": {
+  "Batterylife_Jeita_VPBTest_100_to_3": {
+    "case_id": "Batterylife_Jeita_VPBTest_100_to_3",
+    "case_desc": "利用BatteryCapacityDetectControl工具记录电脑通过播放本地视频将电池电量从100%放电到3%所用的总时间并上传到测试平台",
+    "num_steps": 27,
+    "steps": [
+      {
+        "step": 1,
+        "action": "Set Battery test setting",
+        "tool": "AutoSet",
+        "params": {
+          "_args": [
+            "-battery -TPG -Volume 10 -Brightness 88 -Restart -Testmode Enable"
+          ]
+        }
+      },
+      {
+        "step": 2,
+        "action": "采集软硬件信息",
+        "tool": "CollectHardwareSoftwareInfo",
+        "params": {
+          "_args": [
+            "nan"
+          ]
+        }
+      },
+      {
+        "step": 3,
+        "action": "to remove microsoft software, include: MS 365 APP, MS OneNote, MS VC++, MS Windows Desktop RunTime",
+        "tool": "RemoveMicrosoftProgram",
+        "params": {
+          "_args": [
+            "-r"
+          ]
+        }
+      },
+      {
+        "step": 4,
+        "action": "Uninstall OneDrive app",
+        "tool": "UninstallTeams",
+        "params": {
+          "_args": [
+            "/name \"OneDrive\""
+          ]
+        }
+      },
+      {
+        "step": 5,
+        "action": "Uninstall Microsoft Teams UWP app",
+        "tool": "UninstallTeams",
+        "params": {
+          "_args": [
+            "/name \"Teams\""
+          ]
+        }
+      },
+      {
+        "step": 6,
+        "action": "设置系统中屏幕的亮度",
+        "tool": "SetBrightness",
+        "params": {
+          "_args": [
+            "/Brightness 82"
+          ]
+        }
+      },
+      {
+        "step": 7,
+        "action": "设置笔记本默认声卡的音量大小",
+        "tool": "SetComputerVolume",
+        "params": {
+          "_args": [
+            "/Volum 0"
+          ]
+        }
+      },
+      {
+        "step": 8,
+        "action": "设置壁纸1-Think_White.jpg",
+        "tool": "ChangeOSBackgroundBattery",
+        "params": {
+          "_args": [
+            "/F 1-Think_White.jpg"
+          ]
+        }
+      },
+      {
+        "step": 9,
+        "action": "PDU_direct_off直接关",
+        "tool": "DeviceNetRequest",
+        "params": {
+          "testUnitUuid": "4899fbed58f",
+          "times": 0,
+          "parentTestModelOperationUuid": "e0eeb774579f3788",
+          "action": "poweroff",
+          "testModelNodeUuid": "7460c72717877d7",
+          "testTaskCode": "TT200037",
+          "controlCmd": "Direct",
+          "cancel": 0,
+          "messageUuid": "5656565",
+          "FW": "1",
+          "ctrlCmdType": "0",
+          "timing": "1634802625"
+        }
+      },
+      {
+        "step": 10,
+        "action": "Set System PowerMode 为BestPowerEfficienct",
+        "tool": "SetPowerMode",
+        "params": {
+          "_args": [
+            "/P BestPowerEfficienct"
+          ]
+        }
+      },
+      {
+        "step": 11,
+        "action": "Reboot",
+        "tool": "SxPowerTest",
+        "params": {
+          "_args": [
+            "‘--TestFunction Wb --TestTimes 1 --CountDownTime 10 --SleepTime 60 --CheckDeviceMode Nothing /X_SkipShutdown"
+          ]
+        }
+      },
+      {
+        "step": 12,
+        "action": "PDU_direct_on直接开",
+        "tool": "DeviceNetRequest",
+        "params": {
+          "testUnitUuid": "4899fbed58f",
+          "times": 0,
+          "parentTestModelOperationUuid": "e0eeb774579f3788",
+          "action": "poweron",
+          "testModelNodeUuid": "7460c72717877d7",
+          "testTaskCode": "TT200037",
+          "controlCmd": "Direct",
+          "cancel": 0,
+          "messageUuid": "5656565",
+          "FW": "1",
+          "ctrlCmdType": "0",
+          "timing": "1634802625"
+        }
+      },
+      {
+        "step": 13,
+        "action": "Change System DPI to 100%",
+        "tool": "ChangeSystemDPI",
+        "params": {
+          "_args": [
+            "/V New"
+          ]
+        }
+      },
+      {
+        "step": 14,
+        "action": "判断电池电量是否在一定范围内",
+        "tool": "CheckBatteryLevel",
+        "params": {
+          "_args": [
+            "/Min 100"
+          ]
+        }
+      },
+      {
+        "step": 15,
+        "action": "Play Local Video with MP",
+        "tool": "PlayLocalVideo",
+        "params": {
+          "_args": [
+            "-S Yes"
+          ]
+        }
+      },
+      {
+        "step": 16,
+        "action": "抓取CPU使用率， 并绘制曲线",
+        "tool": "CPUUsage",
+        "params": {
+          "_args": [
+            "/TestDuration 5"
+          ]
+        }
+      },
+      {
+        "step": 17,
+        "action": "PDU_direct_off直接关",
+        "tool": "DeviceNetRequest",
+        "params": {
+          "testUnitUuid": "4899fbed58f",
+          "times": 0,
+          "parentTestModelOperationUuid": "e0eeb774579f3788",
+          "action": "poweroff",
+          "testModelNodeUuid": "7460c72717877d7",
+          "testTaskCode": "TT200037",
+          "controlCmd": "Direct",
+          "cancel": 0,
+          "messageUuid": "5656565",
+          "FW": "1",
+          "ctrlCmdType": "0",
+          "timing": "1634802625"
+        }
+      },
+      {
+        "step": 18,
+        "action": "run ACin_auto_on.exe and pass the result",
+        "tool": "ACinAutoOnWrap",
+        "params": {
+          "_args": [
+            "-r"
+          ]
+        }
+      },
+      {
+        "step": 19,
+        "action": "Disable LAN",
+        "tool": "ChangeLanStatus",
+        "params": {
+          "_args": [
+            "/S Disable"
+          ]
+        }
+      },
+      {
+        "step": 20,
+        "action": "Battery life 放电电池监测",
+        "tool": "BatteryCapacityDetectControl",
+        "params": {
+          "_args": [
+            "/A DisCharge /P 3 /T 60"
+          ]
+        }
+      },
+      {
+        "step": 21,
+        "action": "设置壁纸1-Think_White.jpg",
+        "tool": "ChangeOSBackgroundBattery",
+        "params": {
+          "_args": [
+            "/F 1-Think_White.jpg"
+          ]
+        }
+      },
+      {
+        "step": 22,
+        "action": "Enable LAN",
+        "tool": "ChangeLanStatus",
+        "params": {
+          "_args": [
+            "/S Enable"
+          ]
+        }
+      },
+      {
+        "step": 23,
+        "action": "PDU_direct_on直接开",
+        "tool": "DeviceNetRequest",
+        "params": {
+          "testUnitUuid": "4899fbed58f",
+          "times": 0,
+          "parentTestModelOperationUuid": "e0eeb774579f3788",
+          "action": "poweron",
+          "testModelNodeUuid": "7460c72717877d7",
+          "testTaskCode": "TT200037",
+          "controlCmd": "Direct",
+          "cancel": 0,
+          "messageUuid": "5656565",
+          "FW": "1",
+          "ctrlCmdType": "0",
+          "timing": "1634802625"
+        }
+      },
+      {
+        "step": 24,
+        "action": "默认从C盘根目录抓取电池寿命日志文件batterylife.log文件上传到平台",
+        "tool": "BatteryLifeCollectionLog",
+        "params": {
+          "_args": [
+            "nan"
+          ]
+        }
+      },
+      {
+        "step": 25,
+        "action": "设置壁纸1-Think_White.jpg",
+        "tool": "ChangeOSBackgroundBattery",
+        "params": {
+          "_args": [
+            "/F 1-Think_White.jpg"
+          ]
+        }
+      },
+      {
+        "step": 26,
+        "action": "Battery life 充放电电池监测",
+        "tool": "BatteryCapacityDetectControl",
+        "params": {
+          "_args": [
+            "/A Charge /P 100 /T 60"
+          ]
+        }
+      },
+      {
+        "step": 27,
+        "action": "默认从C盘根目录抓取电池寿命日志文件batterylife.log文件上传到平台",
+        "tool": "BatteryLifeCollectionLog",
+        "params": {
+          "_args": [
+            "nan"
+          ]
+        }
+      }
+    ]
+  },
+  "NightRaid_Stress_240min_windows": {
+    "case_id": "NightRaid_Stress_240min_windows",
+    "case_desc": "利用PXA工具进行3DMark的NightRaid场景的Stress测试，用窗口模式，测试时长240分钟",
+    "num_steps": 5,
+    "steps": [
+      {
+        "step": 1,
+        "action": "Set Stress Mode",
+        "tool": "AutoSet",
+        "params": {
+          "_args": [
+            "‘-stress -Restart"
+          ]
+        }
+      },
+      {
+        "step": 2,
+        "action": "Install Systeminfo",
+        "tool": "SystemInfoInstall",
+        "params": {
+          "_args": [
+            "/ID SystemInfo"
+          ]
+        }
+      },
+      {
+        "step": 3,
+        "action": "Install 3DMark",
+        "tool": "3DMarkInstall",
+        "params": {
+          "_args": [
+            "/ID 3DMark"
+          ]
+        }
+      },
+      {
+        "step": 4,
+        "action": "Reboot",
+        "tool": "SxPowerTest",
+        "params": {
+          "_args": [
+            "/X Wb /F1 5 /S 90"
+          ]
+        }
+      },
+      {
+        "step": 5,
+        "action": "NightRaid_Stress_240min_windows",
+        "tool": "PXA",
+        "params": {
+          "_args": [
+            "/Job 3DMarkStress"
+          ]
+        },
+        "notes": "对应场景配置文件NightRaid.db,"
+      }
+    ]
+  },
+  "Perf_3DMark_2cycles": {
+    "case_id": "Perf_3DMark_2cycles",
+    "case_desc": "利用LUTC进行3DMark Performance测试,需要包含下列场景3DMark_WildLife_Extreme, \n3DMark_WildLife_Unlimited,\n3DMark_WildLife,\n3DMark_FireStrike_Ultra,\n3DMark_FireStrike,\n3DMark_FireStrike_Extreme,\n3DMark_TimeSpy,\n3DMark_TimeSpy_Extreme,\n3DMark_NightRaid,\n3DMark_PortRoyal,\n3DMark_SpeedWay,，每个场景测试两轮",
+    "num_steps": 19,
+    "steps": [
+      {
+        "step": 1,
+        "action": "Set Performance test setting",
+        "tool": "AutoSet",
+        "params": {
+          "_args": [
+            "’-performance-TPG -Volume 10 -Brightness 88 -Restart -Testmode Enable"
+          ]
+        }
+      },
+      {
+        "step": 2,
+        "action": "Install Systeminfo",
+        "tool": "SystemInfoInstall",
+        "params": {
+          "_args": [
+            "/ID SystemInfo"
+          ]
+        }
+      },
+      {
+        "step": 3,
+        "action": "Install IPTAT",
+        "tool": "IPTATinstall",
+        "params": {
+          "_args": [
+            "/I PTAT"
+          ]
+        }
+      },
+      {
+        "step": 4,
+        "action": "Install NVGPUMon",
+        "tool": "NVGPUMonInstall",
+        "params": {
+          "_args": [
+            "/ID NVGPUMon"
+          ]
+        }
+      },
+      {
+        "step": 5,
+        "action": "Install AMD SystemDeck",
+        "tool": "SystemDeckInstall",
+        "params": {
+          "_args": [
+            "/ID SystemDeck"
+          ]
+        }
+      },
+      {
+        "step": 6,
+        "action": "Install 3DMark",
+        "tool": "3DMarkInstall",
+        "params": {
+          "_args": [
+            "/ID 3DMark"
+          ]
+        }
+      },
+      {
+        "step": 7,
+        "action": "Reboot",
+        "tool": "SxPowerTest",
+        "params": {
+          "_args": [
+            "‘--TestFunction Wb --TestTimes 1 --CountDownTime 10 --SleepTime 60 --CheckDeviceMode Nothing /X_SkipShutdown"
+          ]
+        }
+      },
+      {
+        "step": 8,
+        "action": "采集软硬件信息",
+        "tool": "CollectHardwareSoftwareInfo",
+        "params": {
+          "_args": [
+            "nan"
+          ]
+        }
+      },
+      {
+        "step": 9,
+        "action": "测试3DMark_WildLifeExtreme_2cycles",
+        "tool": "LUTC",
+        "params": {
+          "_args": [
+            "/Job 3DMark_WildLife_Extreme /I 15 /S 2 /L /C"
+          ]
+        }
+      },
+      {
+        "step": 10,
+        "action": "测试3DMark_WildLifeUnlimited_2cycles",
+        "tool": "LUTC",
+        "params": {
+          "_args": [
+            "/Job 3DMark_WildLife_Unlimited /I 15 /S 2 /L /C"
+          ]
+        }
+      },
+      {
+        "step": 11,
+        "action": "测试3DMark_WildLife_2cycles",
+        "tool": "LUTC",
+        "params": {
+          "_args": [
+            "/Job 3DMark_WildLife /I 15 /S 2 /L /C"
+          ]
+        }
+      },
+      {
+        "step": 12,
+        "action": "测试3DMark_FireStrikeUltra_2cycles",
+        "tool": "LUTC",
+        "params": {
+          "_args": [
+            "/Job 3DMark_FireStrike_Ultra /I 15 /S 2 /L /C"
+          ]
+        }
+      },
+      {
+        "step": 13,
+        "action": "测试3DMark_FireStrike_2cycles",
+        "tool": "LUTC",
+        "params": {
+          "_args": [
+            "/Job 3DMark_FireStrike /I 15 /S 2 /L /C"
+          ]
+        }
+      },
+      {
+        "step": 14,
+        "action": "测试3DMark_FireStrikeExtreme_2cycles",
+        "tool": "LUTC",
+        "params": {
+          "_args": [
+            "/Job 3DMark_FireStrike_Extreme /I 15 /S 2 /L /C"
+          ]
+        }
+      },
+      {
+        "step": 15,
+        "action": "测试3DMark_TimeSpy_2cycles",
+        "tool": "LUTC",
+        "params": {
+          "_args": [
+            "/Job 3DMark_TimeSpy /I 15 /S 2 /L /C"
+          ]
+        }
+      },
+      {
+        "step": 16,
+        "action": "测试3DMark_TimeSpyExtreme_2cycles",
+        "tool": "LUTC",
+        "params": {
+          "_args": [
+            "/Job 3DMark_TimeSpy_Extreme /I 15 /S 2 /L /C"
+          ]
+        }
+      },
+      {
+        "step": 17,
+        "action": "测试3DMark_NightRaid_2cycles",
+        "tool": "LUTC",
+        "params": {
+          "_args": [
+            "/Job 3DMark_NightRaid /I 15 /S 2 /L /C"
+          ]
+        }
+      },
+      {
+        "step": 18,
+        "action": "测试3DMark_PortRoyal_2cycles",
+        "tool": "LUTC",
+        "params": {
+          "_args": [
+            "/Job 3DMark_PortRoyal /I 15 /S 2 /L /C"
+          ]
+        }
+      },
+      {
+        "step": 19,
+        "action": "测试3DMark_SpeedWay_2cycles",
+        "tool": "LUTC",
+        "params": {
+          "_args": [
+            "/Job 3DMark_SpeedWay /I 15 /S 2 /L /C"
+          ]
+        }
+      }
+    ]
+  },
+  "Perf_CinebenchR20_2cycles": {
+    "case_id": "Perf_CinebenchR20_2cycles",
+    "case_desc": "利用LUTC进行CinebenchR20多核场景的性能测试，测试两轮",
+    "num_steps": 9,
+    "steps": [
+      {
+        "step": 1,
+        "action": "Set Performance test setting",
+        "tool": "AutoSet",
+        "params": {
+          "_args": [
+            "’-performance-TPG -Volume 10 -Brightness 88 -Restart -Testmode Enable"
+          ]
+        }
+      },
+      {
+        "step": 2,
+        "action": "Install Systeminfo",
+        "tool": "SystemInfoInstall",
+        "params": {
+          "_args": [
+            "/ID SystemInfo"
+          ]
+        }
+      },
+      {
+        "step": 3,
+        "action": "Install IPTAT",
+        "tool": "IPTATinstall",
+        "params": {
+          "_args": [
+            "/I PTAT"
+          ]
+        }
+      },
+      {
+        "step": 4,
+        "action": "Install NVGPUMon",
+        "tool": "NVGPUMonInstall",
+        "params": {
+          "_args": [
+            "/ID NVGPUMon"
+          ]
+        }
+      },
+      {
+        "step": 5,
+        "action": "Install AMD SystemDeck",
+        "tool": "SystemDeckInstall",
+        "params": {
+          "_args": [
+            "/ID SystemDeck"
+          ]
+        }
+      },
+      {
+        "step": 6,
+        "action": "Install CinebenchR20",
+        "tool": "CinebenchR20Install",
+        "params": {
+          "_args": [
+            "/ID CinebenchR20"
+          ]
+        }
+      },
+      {
+        "step": 7,
+        "action": "采集软硬件信息",
+        "tool": "CollectHardwareSoftwareInfo",
+        "params": {
+          "_args": [
+            "nan"
+          ]
+        }
+      },
+      {
+        "step": 8,
+        "action": "Run CineBenchR20_Multiple_2cycles",
+        "tool": "LUTC",
+        "params": {
+          "_args": [
+            "/Job CB20_MultipleCore /I 15 /S 2 /L /C"
+          ]
+        }
+      },
+      {
+        "step": null,
+        "action": "Reboot",
+        "tool": "SxPowerTest",
+        "params": {
+          "_args": [
+            "‘--TestFunction Wb --TestTimes 1 --CountDownTime 10 --SleepTime 60 --CheckDeviceMode Nothing /X_SkipShutdown"
+          ]
+        }
+      }
+    ]
+  },
+  "Perf_CinebenchR23_2cycles": {
+    "case_id": "Perf_CinebenchR23_2cycles",
+    "case_desc": "利用LUTC进行CinebenchR23多核场景的性能测试，测试两轮",
+    "num_steps": 9,
+    "steps": [
+      {
+        "step": 1,
+        "action": "Set Performance test setting",
+        "tool": "AutoSet",
+        "params": {
+          "_args": [
+            "’-performance-TPG -Volume 10 -Brightness 88 -Restart -Testmode Enable"
+          ]
+        }
+      },
+      {
+        "step": 2,
+        "action": "Install Systeminfo",
+        "tool": "SystemInfoInstall",
+        "params": {
+          "_args": [
+            "/ID SystemInfo"
+          ]
+        }
+      },
+      {
+        "step": 3,
+        "action": "Install IPTAT",
+        "tool": "IPTATinstall",
+        "params": {
+          "_args": [
+            "/I PTAT"
+          ]
+        }
+      },
+      {
+        "step": 4,
+        "action": "Install NVGPUMon",
+        "tool": "NVGPUMonInstall",
+        "params": {
+          "_args": [
+            "/ID NVGPUMon"
+          ]
+        }
+      },
+      {
+        "step": 5,
+        "action": "Install AMD SystemDeck",
+        "tool": "SystemDeckInstall",
+        "params": {
+          "_args": [
+            "/ID SystemDeck"
+          ]
+        }
+      },
+      {
+        "step": 6,
+        "action": "Install CinebenchR23",
+        "tool": "CinebenchR23Install",
+        "params": {
+          "_args": [
+            "/ID CinebenchR23"
+          ]
+        }
+      },
+      {
+        "step": 7,
+        "action": "采集软硬件信息",
+        "tool": "CollectHardwareSoftwareInfo",
+        "params": {
+          "_args": [
+            "nan"
+          ]
+        }
+      },
+      {
+        "step": 8,
+        "action": "Run CinebenchR23_Multiple_2cycles",
+        "tool": "LUTC",
+        "params": {
+          "_args": [
+            "/Job CB23_MultipleCore /I 15 /S 2 /L /C"
+          ]
+        }
+      },
+      {
+        "step": null,
+        "action": "Reboot",
+        "tool": "SxPowerTest",
+        "params": {
+          "_args": [
+            "‘--TestFunction Wb --TestTimes 1 --CountDownTime 10 --SleepTime 60 --CheckDeviceMode Nothing /X_SkipShutdown"
+          ]
+        }
+      }
+    ]
+  },
+  "Perf_PassMark_2cycles": {
+    "case_id": "Perf_PassMark_2cycles",
+    "case_desc": "利用LUTC进行PassMark性能测试，测试两轮",
+    "num_steps": 9,
+    "steps": [
+      {
+        "step": 1,
+        "action": "Set Performance test setting",
+        "tool": "AutoSet",
+        "params": {
+          "_args": [
+            "’-performance-TPG -Volume 10 -Brightness 88 -Restart -Testmode Enable"
+          ]
+        }
+      },
+      {
+        "step": 2,
+        "action": "Install IPTAT",
+        "tool": "IPTATinstall",
+        "params": {
+          "_args": [
+            "/I PTAT"
+          ]
+        }
+      },
+      {
+        "step": 3,
+        "action": "Install NVGPUMon",
+        "tool": "NVGPUMonInstall",
+        "params": {
+          "_args": [
+            "/ID NVGPUMon"
+          ]
+        }
+      },
+      {
+        "step": 4,
+        "action": "Install AMD SystemDeck",
+        "tool": "SystemDeckInstall",
+        "params": {
+          "_args": [
+            "/ID SystemDeck"
+          ]
+        }
+      },
+      {
+        "step": 5,
+        "action": "Install PassMark",
+        "tool": "PassMarkInstall",
+        "params": {
+          "_args": [
+            "/ID PassMark"
+          ]
+        }
+      },
+      {
+        "step": 6,
+        "action": "PassMark注册",
+        "tool": "PassmarkRegisterv11",
+        "params": {
+          "_args": [
+            "nan"
+          ]
+        }
+      },
+      {
+        "step": 7,
+        "action": "Reboot",
+        "tool": "SxPowerTest",
+        "params": {
+          "_args": [
+            "‘--TestFunction Wb --TestTimes 1 --CountDownTime 10 --SleepTime 60 --CheckDeviceMode Nothing /X_SkipShutdown"
+          ]
+        }
+      },
+      {
+        "step": 8,
+        "action": "采集软硬件信息",
+        "tool": "CollectHardwareSoftwareInfo",
+        "params": {
+          "_args": [
+            "nan"
+          ]
+        }
+      },
+      {
+        "step": 9,
+        "action": "PassMark测试两轮",
+        "tool": "LUTC",
+        "params": {
+          "_args": [
+            "/Job PassMark_ALL /I 15 /S 2 /C /L"
+          ]
+        }
+      }
+    ]
+  },
+
+  
+  "Stress_Burnin_120Min": {
+    "case_id": "Stress_Burnin_120Min",
+    "case_desc": "利用BurnInTestStress工具进行电脑烤机压力测试，测试时间120分钟",
+    "num_steps": 4,
+    "steps": [
+      {
+        "step": 1,
+        "action": "Reboot",
+        "tool": "SxPowerTest",
+        "params": {
+          "_args": [
+            "‘--TestFunction Wb --TestTimes 1 --CountDownTime 10 --SleepTime 60 --CheckDeviceMode Nothing /X_SkipShutdown"
+          ]
+        }
+      },
+      {
+        "step": 2,
+        "action": "BurnIn10 Install",
+        "tool": "BurnIn10Install",
+        "params": {
+          "_args": [
+            "/V 10.2.1015.0"
+          ]
+        }
+      },
+      {
+        "step": 3,
+        "action": "硬件软件信息收集",
+        "tool": "UnitInfoCollector",
+        "params": {
+          "_args": [
+            "nan"
+          ]
+        }
+      },
+      {
+        "step": 4,
+        "action": "BurnIn Test 120分钟",
+        "tool": "BurnInTestStress",
+        "params": {
+          "TestTime": "\"120\""
+        }
+      }
+    ]
+  },
+  "Stress_CGTTPXA_CPU_Customer_Intel": {
+    "case_id": "Stress_CGTTPXA_CPU_Customer_Intel",
+    "case_desc": "利用PXA工具进行Intel平台在Customer模式下的CPU单拷压力测试",
+    "num_steps": 8,
+    "steps": [
+      {
+        "step": 1,
+        "action": "Lvar function---enable mfg mode",
+        "tool": "LvarMBV",
+        "params": {
+          "_args": [
+            "/w /mfgmode /c \"M\""
+          ]
+        }
+      },
+      {
+        "step": 2,
+        "action": "Reboot",
+        "tool": "SxPowerTest",
+        "params": {
+          "_args": [
+            "’--TestFunction Wb --TestTimes 1 --CountDownTime 90 --SleepTime 60 --CheckDeviceMode Nothing"
+          ]
+        }
+      },
+      {
+        "step": 3,
+        "action": "打开TestMode",
+        "tool": "OSTestModel",
+        "params": {
+          "_args": [
+            "/A Open"
+          ]
+        }
+      },
+      {
+        "step": 4,
+        "action": "硬件软件信息收集",
+        "tool": "UnitInfoCollector",
+        "params": {
+          "_args": [
+            "nan"
+          ]
+        }
+      },
+      {
+        "step": 5,
+        "action": "Install IPTAT",
+        "tool": "IPTATinstall",
+        "params": {
+          "_args": [
+            "/ID PTAT"
+          ]
+        }
+      },
+      {
+        "step": 6,
+        "action": "Reboot",
+        "tool": "SxPowerTest",
+        "params": {
+          "_args": [
+            "‘--TestFunction Wb --TestTimes 1 --CountDownTime 10 --SleepTime 60 --CheckDeviceMode Nothing /X_SkipShutdown"
+          ]
+        }
+      },
+      {
+        "step": 7,
+        "action": "关闭Lenovo PcManager",
+        "tool": "LenovoPcMangerOnOff",
+        "params": {
+          "_args": [
+            "’-S Off"
+          ]
+        }
+      },
+      {
+        "step": 8,
+        "action": "CGTT PXA CPU customer mode singleroast Test",
+        "tool": "PXA",
+        "params": {
+          "_args": [
+            "/Job CPU_Single_Customer"
+          ]
+        }
+      }
+    ]
+  },
+  "Stress_CGTTPXA_GPU_Intel": {
+    "case_id": "Stress_CGTTPXA_GPU_Intel",
+    "case_desc": "利用PXA工具进行Intel平台在Performance模式下的GPU单拷压力测试",
+    "num_steps": 9,
+    "steps": [
+      {
+        "step": 1,
+        "action": "Lvar function---enable mfg mode",
+        "tool": "LvarMBV",
+        "params": {
+          "_args": [
+            "/w /mfgmode /c \"M\""
+          ]
+        }
+      },
+      {
+        "step": 2,
+        "action": "Reboot",
+        "tool": "SxPowerTest",
+        "params": {
+          "_args": [
+            "’--TestFunction Wb --TestTimes 1 --CountDownTime 90 --SleepTime 60 --CheckDeviceMode Nothing"
+          ]
+        }
+      },
+      {
+        "step": 3,
+        "action": "打开TestMode",
+        "tool": "OSTestModel",
+        "params": {
+          "_args": [
+            "/A Open"
+          ]
+        }
+      },
+      {
+        "step": 4,
+        "action": "硬件软件信息收集",
+        "tool": "UnitInfoCollector",
+        "params": {
+          "_args": [
+            "nan"
+          ]
+        }
+      },
+      {
+        "step": 5,
+        "action": "Install Furmark",
+        "tool": "InstallFurmark",
+        "params": {
+          "_args": [
+            "/ID Furmark"
+          ]
+        }
+      },
+      {
+        "step": 6,
+        "action": "Install NVGPUMon",
+        "tool": "NVGPUMonInstall",
+        "params": {
+          "_args": [
+            "/ID NVGPUMon"
+          ]
+        }
+      },
+      {
+        "step": 7,
+        "action": "Reboot",
+        "tool": "SxPowerTest",
+        "params": {
+          "_args": [
+            "‘--TestFunction Wb --TestTimes 1 --CountDownTime 10 --SleepTime 60 --CheckDeviceMode Nothing /X_SkipShutdown"
+          ]
+        }
+      },
+      {
+        "step": 8,
+        "action": "关闭Lenovo PcManager",
+        "tool": "LenovoPcMangerOnOff",
+        "params": {
+          "_args": [
+            "’-S Off"
+          ]
+        }
+      },
+      {
+        "step": 9,
+        "action": "CGTT PXA GPU performance mode singleroast Test",
+        "tool": "PXA",
+        "params": {
+          "_args": [
+            "/Job GPU_Single"
+          ]
+        }
+      }
+    ]
+  },
+  "Stress_CGTT_Double_AMD": {
+    "case_id": "Stress_CGTT_Double_AMD",
+    "case_desc": "利用PXA工具进行AMD平台在Performance模式下的双拷压力测试",
+    "num_steps": 7,
+    "steps": [
+      {
+        "step": 1,
+        "action": "Reboot",
+        "tool": "SxPowerTest",
+        "params": {
+          "_args": [
+            "‘--TestFunction Wb --TestTimes 1 --CountDownTime 10 --SleepTime 60 --CheckDeviceMode Nothing"
+          ]
+        }
+      },
+      {
+        "step": 2,
+        "action": "采集软硬件信息",
+        "tool": "CollectHardwareSoftwareInfo",
+        "params": {
+          "_args": [
+            "nan"
+          ]
+        }
+      },
+      {
+        "step": 3,
+        "action": "Install AMD SystemDeck",
+        "tool": "SystemDeckInstall",
+        "params": {
+          "_args": [
+            "/ID SystemDeck"
+          ]
+        }
+      },
+      {
+        "step": 4,
+        "action": "Install Furmark，For GPU stress test",
+        "tool": "InstallFurmark",
+        "params": {
+          "_args": [
+            "/ID Furmark"
+          ]
+        }
+      },
+      {
+        "step": 5,
+        "action": "Install NVGPUMon",
+        "tool": "NVGPUMonInstall",
+        "params": {
+          "_args": [
+            "/ID NVGPUMon"
+          ]
+        }
+      },
+      {
+        "step": 6,
+        "action": "设置Perfomance Mode",
+        "tool": "PMSWitchEx",
+        "params": {
+          "_args": [
+            "’-set performance"
+          ]
+        }
+      },
+      {
+        "step": 7,
+        "action": "Stress CGTT Tool model",
+        "tool": "PXA",
+        "params": {
+          "_args": [
+            "/Job CGTT"
+          ]
+        }
+      }
+    ]
+  },
+  "Stress_CGTT_Double_Intel": {
+    "case_id": "Stress_CGTT_Double_Intel",
+    "case_desc": "利用PXA工具进行Intel平台在Performance模式下的双拷压力测试",
+    "num_steps": 7,
+    "steps": [
+      {
+        "step": 1,
+        "action": "Reboot",
+        "tool": "SxPowerTest",
+        "params": {
+          "_args": [
+            "‘--TestFunction Wb --TestTimes 1 --CountDownTime 10 --SleepTime 60 --CheckDeviceMode Nothing"
+          ]
+        }
+      },
+      {
+        "step": 2,
+        "action": "采集软硬件信息",
+        "tool": "CollectHardwareSoftwareInfo",
+        "params": {
+          "_args": [
+            "nan"
+          ]
+        }
+      },
+      {
+        "step": 3,
+        "action": "Install IPTAT",
+        "tool": "IPTATinstall",
+        "params": {
+          "_args": [
+            "/ID PTAT"
+          ]
+        }
+      },
+      {
+        "step": 4,
+        "action": "Install Furmark，For GPU stress test",
+        "tool": "InstallFurmark",
+        "params": {
+          "_args": [
+            "/ID Furmark"
+          ]
+        }
+      },
+      {
+        "step": 5,
+        "action": "Install NVGPUMon",
+        "tool": "NVGPUMonInstall",
+        "params": {
+          "_args": [
+            "/ID NVGPUMon"
+          ]
+        }
+      },
+      {
+        "step": 6,
+        "action": "设备Perfomance Mode",
+        "tool": "PMSWitchEx",
+        "params": {
+          "_args": [
+            "’-set performance"
+          ]
+        }
+      },
+      {
+        "step": 7,
+        "action": "Stress CGTT Tool model",
+        "tool": "PXA",
+        "params": {
+          "_args": [
+            "/Job CGTT"
+          ]
+        }
+      }
+    ]
+  },
+  "Stress_S3_500Cycle": {
+    "case_id": "Stress_S3_500Cycle",
+    "case_desc": "利用OSAgingTool工具测试MS(Modern Standby) 压力测试，测试次数500",
+    "num_steps": 2,
+    "steps": [
+      {
+        "step": 1,
+        "action": "Set Stress Mode",
+        "tool": "AutoSet",
+        "params": {
+          "_args": [
+            "‘-stress -Restart"
+          ]
+        }
+      },
+      {
+        "step": 2,
+        "action": "MS测试500次",
+        "tool": "OSAgingTool",
+        "params": {
+          "_args": [
+            "’--TestFunction Ms --TestTimes 500 --CountDownTime 90 --SleepTime 60 --CheckDeviceMode CheckAll --IgnoredDevices \"Widi Adapter",
+            "AX88179",
+            "AX88772",
+            "Microsoft Wi-Fi Direct Virtual Adapter",
+            "Bluetooth Device",
+            "Generic PnP Monitor",
+            "Lenovo DisplayHDR",
+            "Generic Monitor",
+            "Realtek(R) USB GbE Family Controller\" /X_Min True"
+          ]
+        }
+      }
+    ]
+  },
+  "Stress_S4_500Cycle": {
+    "case_id": "Stress_S4_500Cycle",
+    "case_desc": "利用OSAgingTool工具测试S4(休眠) 压力测试，测试次数500",
+    "num_steps": 2,
+    "steps": [
+      {
+        "step": 1,
+        "action": "Set Stress Mode",
+        "tool": "AutoSet",
+        "params": {
+          "_args": [
+            "‘-stress -Restart"
+          ]
+        }
+      },
+      {
+        "step": 2,
+        "action": "S4测试500次",
+        "tool": "OSAgingTool",
+        "params": {
+          "_args": [
+            "‘--TestFunction S4 --TestTimes 500 --CountDownTime 90 --SleepTime 60 --CheckDeviceMode CheckAll --IgnoredDevices \"Widi Adapter",
+            "AX88179",
+            "AX88772",
+            "Microsoft Wi-Fi Direct Virtual Adapter",
+            "Bluetooth Device",
+            "Generic PnP Monitor",
+            "Lenovo DisplayHDR",
+            "Generic Monitor",
+            "Realtek(R) USB GbE Family Controller\" /X_Min True"
+          ]
+        }
+      }
+    ]
+  },
+  "Stress_Solarbay_PXA_240min_IMG": {
+    "case_id": "Stress_Solarbay_PXA_240min_IMG",
+    "case_desc": "利用PXA工具进行3DMark的Solarbay场景的Stress测试，用全屏模式测试时长240分钟",
+    "num_steps": 5,
+    "steps": [
+      {
+        "step": 1,
+        "action": "Set Stress Mode",
+        "tool": "AutoSet",
+        "params": {
+          "_args": [
+            "‘-stress -Restart"
+          ]
+        }
+      },
+      {
+        "step": 2,
+        "action": "Install Systeminfo",
+        "tool": "SystemInfoInstall",
+        "params": {
+          "_args": [
+            "/ID SystemInfo"
+          ]
+        }
+      },
+      {
+        "step": 3,
+        "action": "Install 3DMark",
+        "tool": "3DMarkInstall",
+        "params": {
+          "_args": [
+            "/ID 3DMark"
+          ]
+        }
+      },
+      {
+        "step": 4,
+        "action": "Reboot",
+        "tool": "SxPowerTest",
+        "params": {
+          "_args": [
+            "/X Wb /F1 5 /S 90"
+          ]
+        }
+      },
+      {
+        "step": 5,
+        "action": "Stress_Solarbay_PXA_240min_IMG",
+        "tool": "PXA",
+        "params": {
+          "_args": [
+            "/Job 3DMarkStress"
+          ]
+        },
+        "notes": "对应场景配置文件Solarbay.db,"
+      }
+    ]
+  },
+  "Stress_SteelNormadVulkan_PXA_240min": {
+    "case_id": "Stress_SteelNormadVulkan_PXA_240min",
+    "case_desc": "利用PXA工具进行3DMark的SteelNormadVulkan场景的Stress测试，用全屏模式测试时长240分钟",
+    "num_steps": 5,
+    "steps": [
+      {
+        "step": 1,
+        "action": "Set Stress Mode",
+        "tool": "AutoSet",
+        "params": {
+          "_args": [
+            "‘-stress -Restart"
+          ]
+        }
+      },
+      {
+        "step": 2,
+        "action": "Install Systeminfo",
+        "tool": "SystemInfoInstall",
+        "params": {
+          "_args": [
+            "/ID SystemInfo"
+          ]
+        }
+      },
+      {
+        "step": 3,
+        "action": "Install 3DMark",
+        "tool": "3DMarkInstall",
+        "params": {
+          "_args": [
+            "/ID 3DMark"
+          ]
+        }
+      },
+      {
+        "step": 4,
+        "action": "Reboot",
+        "tool": "SxPowerTest",
+        "params": {
+          "_args": [
+            "/X Wb /F1 5 /S 90"
+          ]
+        }
+      },
+      {
+        "step": 5,
+        "action": "Stress_SteelNormadVulkan_PXA_240min",
+        "tool": "PXA",
+        "params": {
+          "_args": [
+            "/Job 3DMarkStress"
+          ]
+        },
+        "notes": "对应场景配置文件SteelNormadVulkan.db,"
+      }
+    ]
+  },
+  "WebRelease 测试": {
+    "case_id": "WebRelease 测试",
+    "case_desc": "利用DownloadWebSourcefile工具从SPMS系统下载指定项目的驱动包并打包成Web Release可执行文件，再进行安装测试和Windows Logo检查",
+    "num_steps": 10,
+    "steps": [
+      {
+        "step": 1,
+        "action": "设置网络连接互联网",
+        "tool": "SetDNSforvLab",
+        "params": {
+          "_args": [
+            "nan"
+          ]
+        }
+      },
+      {
+        "step": 2,
+        "action": "检查网络连接",
+        "tool": "CheckIPConnection.exe",
+        "params": {
+          "_args": [
+            "/D ngspms.lenovo.com"
+          ]
+        },
+        "notes": "SetDNSforvLab"
+      },
+      {
+        "step": 3,
+        "action": "下载Driver Source file",
+        "tool": "DownloadWebSourcefile",
+        "params": {
+          "_args": [
+            "-n \"project name\" -u \"SPMS user\" -p \"SPMS PassWord\" -t [num] tbody default is 1"
+          ]
+        },
+        "notes": "CheckIPConnection.exe"
+      },
+      {
+        "step": 4,
+        "action": "解压Driver Source file",
+        "tool": "UnzipWebSourcefiles",
+        "params": {
+          "_args": [
+            "无"
+          ]
+        },
+        "notes": "DownloadWebSourcefile"
+      },
+      {
+        "step": 5,
+        "action": "打包web exe 文件",
+        "tool": "BuildWebISSfile",
+        "params": {
+          "_args": [
+            "-r"
+          ]
+        },
+        "notes": "UnzipWebSourcefiles"
+      },
+      {
+        "step": 6,
+        "action": "下载Driver Web Exe 文件",
+        "tool": "DownloaduploadwebEXE",
+        "params": {
+          "_args": [
+            "/pd \"ProjectName_date\""
+          ]
+        },
+        "notes": "BuildWebISSfile"
+      },
+      {
+        "step": 7,
+        "action": "安装Driver Web Exe文件",
+        "tool": "InstallWebExe",
+        "params": {
+          "_args": [
+            "nan"
+          ]
+        },
+        "notes": "DownloaduploadwebEXE"
+      },
+      {
+        "step": 8,
+        "action": "重启",
+        "tool": "SxPowerTest",
+        "params": {
+          "_args": [
+            "--TestFunction Wb --TestTimes 1 --CountDownTime 10 --SleepTime 30 --CheckDeviceMode Nothing"
+          ]
+        }
+      },
+      {
+        "step": 9,
+        "action": "检查Web Driver 版本",
+        "tool": "CheckWebDriverVersion",
+        "params": {
+          "_args": [
+            "无"
+          ]
+        }
+      },
+      {
+        "step": 10,
+        "action": "检查Driver Windows Logo",
+        "tool": "CheckWindowsLogo",
+        "params": {
+          "_args": [
+            "/c 21H2"
+          ]
+        }
+      }
+    ]
+  },
+  "Windows Update测试": {
+    "case_id": "Windows Update测试",
+    "case_desc": "利用MDAVTTest工具，为项目所有MTCode执行MDA测试，并汇总所有测试报告",
+    "num_steps": 13,
+    "steps": [
+      {
+        "step": 1,
+        "action": "Download Sign Off Preload",
+        "tool": "AutoPreload.exe",
+        "params": {
+          "-AOD http://mbxfs.lcfuturecenter.com:28080/mbvClient/downloadFile?objectName": "20250908/15/58/47/AODSTAT_70c7305b-24ce-4985-8337-cf34a2c7c239.DAT&bucketName=preload"
+        }
+      },
+      {
+        "step": 2,
+        "action": "解析DMI Table",
+        "tool": "ParsingDMITable",
+        "params": {
+          "_args": [
+            "配置文件DMI Table.xlsx"
+          ]
+        }
+      },
+      {
+        "step": 3,
+        "action": "设置网络连接互联网",
+        "tool": "SetDNSforvLab",
+        "params": {
+          "_args": [
+            "‘--Ip 100.100.231.22"
+          ]
+        }
+      },
+      {
+        "step": 4,
+        "action": "检查测试机SN号是否正常",
+        "tool": "CheckSNTool",
+        "params": {
+          "_args": [
+            "’-T LNB"
+          ]
+        }
+      },
+      {
+        "step": 5,
+        "action": "刷新FamilyName 和 MTCode",
+        "tool": "LNBWULvar",
+        "params": {
+          "_args": [
+            "‘--FamilyName \"IdeaPad L340-15API\" --MTCode \"81LW\""
+          ]
+        },
+        "notes": "有多组MTCode，需要增加多个5.1-5.4，如6.1-6.4"
+      },
+      {
+        "step": 6,
+        "action": "重启",
+        "tool": "SxPowerTest",
+        "params": {
+          "_args": [
+            "--TestFunction Wb --TestTimes 1 --CountDownTime 10 --SleepTime 30 --CheckDeviceMode Nothing"
+          ]
+        }
+      },
+      {
+        "step": 7,
+        "action": "调用MDAVT测试",
+        "tool": "MDAVTTest",
+        "params": {
+          "_args": [
+            "nan"
+          ]
+        }
+      },
+      {
+        "step": 8,
+        "action": "汇总MDA报告",
+        "tool": "AllMDAReportResult",
+        "params": {
+          "_args": [
+            "’-F C:\\AutoWU"
+          ]
+        },
+        "notes": "MDAVTTest"
+      },
+      {
+        "step": 9,
+        "action": "刷新FamilyName 和 MTCode",
+        "tool": "nan",
+        "params": {
+          "_args": [
+            "‘--FamilyName \"IdeaPad L340-15API\" --MTCode \"82LW\""
+          ]
+        }
+      },
+      {
+        "step": 10,
+        "action": "重启",
+        "tool": "nan",
+        "params": {
+          "_args": [
+            "--TestFunction Wb --TestTimes 1 --CountDownTime 10 --SleepTime 30 --CheckDeviceMode Nothing"
+          ]
+        }
+      },
+      {
+        "step": 11,
+        "action": "调用MDAVT测试",
+        "tool": "nan",
+        "params": {
+          "_args": [
+            "nan"
+          ]
+        }
+      },
+      {
+        "step": 12,
+        "action": "汇总MDA报告",
+        "tool": "nan",
+        "params": {
+          "_args": [
+            "’-F C:\\AutoWU"
+          ]
+        }
+      },
+      {
+        "step": 13,
+        "action": "检查MDA 报告",
+        "tool": "checkMDAReport",
+        "params": {
+          "_args": [
+            "’-F C:\\AutoWU"
+          ]
+        },
+        "notes": "MDAVTTest"
+      }
+    ]
+  }
+}
+}

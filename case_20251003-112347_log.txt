@@ -1,0 +1,127 @@
+
+[20251003-112355] INIT_PLAN
+{
+  "case_name": "NightRaid_Stress_240min_windows",
+  "case_desc": "利用PXA工具进行3DMark的NightRaid场景的Stress测试，用窗口模式，测试时长240分钟",
+  "type": 1,
+  "steps": [
+    {
+      "order": 1,
+      "action": "设置压力测试模式并重启",
+      "tool": "AutoSet",
+      "params": "-stress -Restart",
+      "note": "对应上下文条目：Set Stress Mode；理由：配置系统为Stress模式并自动重启"
+    },
+    {
+      "order": 2,
+      "action": "安装SystemInfo工具",
+      "tool": "SystemInfoInstall",
+      "params": "/ID SystemInfo",
+      "note": "对应上下文条目：Install Systeminfo；理由：确保系统信息采集组件就绪"
+    },
+    {
+      "order": 3,
+      "action": "安装3DMark基准测试工具",
+      "tool": "3DMarkInstall",
+      "params": "/ID 3DMark",
+      "note": "对应上下文条目：Install 3DMark；理由：执行3DMark测试前必须完成安装"
+    },
+    {
+      "order": 4,
+      "action": "重启系统以应用配置",
+      "tool": "SxPowerTest",
+      "params": "--TestFunction Wb --TestTimes 1 --CountDownTime 10 --SleepTime 60 --CheckDeviceMode Nothing /X_SkipShutdown",
+      "note": "对应上下文条目：Reboot；理由：确保所有设置在干净状态下生效"
+    },
+    {
+      "order": 5,
+      "action": "运行PXA工具执行3DMark NightRaid场景压力测试，持续240分钟",
+      "tool": "PXA",
+      "params": "/Job 3DMarkStress",
+      "note": "对应上下文条目：对应场景配置文件NightRaid.db,；理由：通过PXA调用指定配置文件实现NightRaid窗口模式长时间压力测试"
+    }
+  ]
+}
+
+[20251003-112358] USER_INPUT_STAGE1
+<confirm>
+
+[20251003-112358] EDITED_PLAN_AFTERSTAGE1
+{
+  "case_name": "NightRaid_Stress_240min_windows",
+  "case_desc": "利用PXA工具进行3DMark的NightRaid场景的Stress测试，用窗口模式，测试时长240分钟",
+  "type": 2,
+  "steps": [
+    {
+      "order": 1,
+      "action": "设置压力测试模式并重启",
+      "tool": "AutoSet",
+      "params": "-stress -Restart",
+      "note": "对应上下文条目：Set Stress Mode；理由：配置系统为Stress模式并自动重启"
+    },
+    {
+      "order": 2,
+      "action": "安装SystemInfo工具",
+      "tool": "SystemInfoInstall",
+      "params": "/ID SystemInfo",
+      "note": "对应上下文条目：Install Systeminfo；理由：确保系统信息采集组件就绪"
+    },
+    {
+      "order": 3,
+      "action": "安装3DMark基准测试工具",
+      "tool": "3DMarkInstall",
+      "params": "/ID 3DMark",
+      "note": "对应上下文条目：Install 3DMark；理由：执行3DMark测试前必须完成安装"
+    },
+    {
+      "order": 4,
+      "action": "重启系统以应用配置",
+      "tool": "SxPowerTest",
+      "params": "--TestFunction Wb --TestTimes 1 --CountDownTime 10 --SleepTime 60 --CheckDeviceMode Nothing /X_SkipShutdown",
+      "note": "对应上下文条目：Reboot；理由：确保所有设置在干净状态下生效"
+    },
+    {
+      "order": 5,
+      "action": "运行PXA工具执行3DMark NightRaid场景压力测试，持续240分钟",
+      "tool": "PXA",
+      "params": "/Job 3DMarkStress",
+      "note": "对应上下文条目：对应场景配置文件NightRaid.db,；理由：通过PXA调用指定配置文件实现NightRaid窗口模式长时间压力测试"
+    }
+  ]
+}
+
+[20251003-112359] USER_INPUT_STEP1
+<confirm>
+
+[20251003-112400] EXEC_RESULT_STEP1
+success=True
+
+[20251003-112400] USER_INPUT_STEP2
+<confirm>
+
+[20251003-112401] EXEC_RESULT_STEP2
+success=True
+
+[20251003-112401] USER_INPUT_STEP3
+<confirm>
+
+[20251003-112402] EXEC_RESULT_STEP3
+success=True
+
+[20251003-112403] USER_INPUT_STEP4
+<confirm>
+
+[20251003-112403] EXEC_RESULT_STEP4
+success=True
+
+[20251003-112408] USER_INPUT_STEP5
+第五步改为SteelNormadDX12场景
+
+[20251003-112414] EXEC_RESULT_STEP5
+用户编辑步骤 5，修改内容：{"action": "用全屏模式运行 SteelNormadDX12 240 分钟", "tool": "PXA", "params": "/Job 3DMarkStress", "note": "对应场景配置文件SteelNormadDX12.db, 推断：用户要求将第五步改为SteelNormadDX12场景，根据上下文'NightRaid_Stress_240min_windows'案例中PXA工具调用方式，保持/Job 3DMarkStress不变，实际场景由配置文件决定"}
+
+[20251003-112423] USER_INPUT_STEP5
+<confirm>
+
+[20251003-112424] EXEC_RESULT_STEP5
+success=True

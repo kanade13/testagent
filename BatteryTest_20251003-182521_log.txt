@@ -1,0 +1,177 @@
+
+[20251003-182624] INIT_PLAN
+{
+  "case_name": "BatteryTest",
+  "case_desc": "电池放电测试",
+  "type": 1,
+  "steps": [
+    {
+      "order": 1,
+      "action": "设置测试机为电池测试模式，包括TPG、音量、亮度、TestMode等并自动重启",
+      "tool": "AutoSet",
+      "params": "-battery -TPG -Volume 10 -Brightness 88 -Restart -Testmode Enable",
+      "note": "对应上下文条目：Set Battery test setting；推断：参数根据Batterylife_Jeita_VPBTest_100_to_3案例中的AutoSet参数设定"
+    },
+    {
+      "order": 2,
+      "action": "收集测试机软硬件信息",
+      "tool": "CollectHardwareSoftwareInfo",
+      "params": "",
+      "note": "对应上下文条目：采集软硬件信息；工具无输入参数"
+    },
+    {
+      "order": 3,
+      "action": "卸载指定的Microsoft软件，包括MS 365 App、OneNote、Visual C++运行库、Windows Desktop Runtime等",
+      "tool": "RemoveMicrosoftProgram",
+      "params": "-r",
+      "note": "对应上下文条目：to remove microsoft software；理由：-r表示批量移除"
+    },
+    {
+      "order": 4,
+      "action": "卸载OneDrive UWP应用",
+      "tool": "UninstallTeams",
+      "params": "/name \"OneDrive\"",
+      "note": "映射：Uninstall OneDrive app -> UninstallTeams，理由：UninstallTeams支持卸载OneDrive；依据上下文UninstallTeams调用条件"
+    },
+    {
+      "order": 5,
+      "action": "卸载Microsoft Teams UWP应用",
+      "tool": "UninstallTeams",
+      "params": "/name \"Teams\"",
+      "note": "对应上下文条目：Uninstall Microsoft Teams UWP app"
+    },
+    {
+      "order": 6,
+      "action": "设置系统屏幕亮度为82%",
+      "tool": "SetBrightness",
+      "params": "/Brightness 82",
+      "note": "对应上下文条目：设置系统中屏幕的亮度；默认值82，与示例一致"
+    },
+    {
+      "order": 7,
+      "action": "设置系统默认声卡音量为0（静音）",
+      "tool": "SetComputerVolume",
+      "params": "/Volum 0",
+      "note": "对应上下文条目：设置笔记本默认声卡的音量大小；示例中0表示静音"
+    },
+    {
+      "order": 8,
+      "action": "设置系统壁纸为1-Think_White.jpg",
+      "tool": "ChangeOSBackgroundBattery",
+      "params": "/F 1-Think_White.jpg",
+      "note": "对应上下文条目：设置壁纸1-Think_White.jpg"
+    },
+    {
+      "order": 9,
+      "action": "通过PDU对测试机执行硬断电",
+      "tool": "DeviceNetRequest",
+      "params": "{\"testUnitUuid\":\"4899fbed58f\",\"times\":0,\"parentTestModelOperationUuid\":\"e0eeb774579f3788\",\"action\":\"poweroff\",\"testModelNodeUuid\":\"7460c72717877d7\",\"testTaskCode\":\"TT200037\",\"controlCmd\":\"Direct\",\"cancel\":0,\"messageUuid\":\"5656565\",\"FW\":\"1\",\"ctrlCmdType\":\"0\",\"timing\":\"1634802625\"}",
+      "note": "对应上下文条目：PDU_direct_off直接关；使用相同json配置模板"
+    },
+    {
+      "order": 10,
+      "action": "设置系统电源模式为最佳能效模式",
+      "tool": "SetPowerMode",
+      "params": "/P BestPowerEfficienct",
+      "note": "对应上下文条目：Set System PowerMode 为BestPowerEfficienct；注意拼写一致性"
+    },
+    {
+      "order": 11,
+      "action": "重启测试机，倒计时10秒，重启后等待60秒",
+      "tool": "SxPowerTest",
+      "params": "--TestFunction Wb --TestTimes 1 --CountDownTime 10 --SleepTime 60 --CheckDeviceMode Nothing /X_SkipShutdown",
+      "note": "对应上下文条目：Reboot；使用标准重启参数"
+    },
+    {
+      "order": 12,
+      "action": "通过PDU对测试机执行硬上电",
+      "tool": "DeviceNetRequest",
+      "params": "{\"testUnitUuid\":\"4899fbed58f\",\"times\":0,\"parentTestModelOperationUuid\":\"e0eeb774579f3788\",\"action\":\"poweron\",\"testModelNodeUuid\":\"7460c72717877d7\",\"testTaskCode\":\"TT200037\",\"controlCmd\":\"Direct\",\"cancel\":0,\"messageUuid\":\"5656565\",\"FW\":\"1\",\"ctrlCmdType\":\"0\",\"timing\":\"1634802625\"}",
+      "note": "对应上下文条目：PDU_direct_on直接开；使用相同json配置模板"
+    },
+    {
+      "order": 13,
+      "action": "将系统DPI缩放设置为100%",
+      "tool": "ChangeSystemDPI",
+      "params": "/V New",
+      "note": "对应上下文条目：Change System DPI to 100%；New在工具内部映射为100%"
+    },
+    {
+      "order": 14,
+      "action": "检查电池电量是否达到100%",
+      "tool": "CheckBatteryLevel",
+      "params": "/Min 100",
+      "note": "对应上下文条目：判断电池电量是否在一定范围内；目标最小值100%"
+    },
+    {
+      "order": 15,
+      "action": "使用MediaPlayer全屏循环播放本地预置视频",
+      "tool": "PlayLocalVideo",
+      "params": "-S Yes",
+      "note": "对应上下文条目：Play Local Video with MP；Yes表示全屏播放"
+    },
+    {
+      "order": 16,
+      "action": "抓取CPU使用率并生成折线图，采样时长5秒",
+      "tool": "CPUUsage",
+      "params": "/TestDuration 5",
+      "note": "对应上下文条目：抓取CPU使用率， 并绘制曲线；默认采样5秒"
+    },
+    {
+      "order": 17,
+      "action": "再次通过PDU执行硬断电以确保状态重置",
+      "tool": "DeviceNetRequest",
+      "params": "{\"testUnitUuid\":\"4899fbed58f\",\"times\":0,\"parentTestModelOperationUuid\":\"e0eeb774579f3788\",\"action\":\"poweroff\",\"testModelNodeUuid\":\"7460c72717877d7\",\"testTaskCode\":\"TT200037\",\"controlCmd\":\"Direct\",\"cancel\":0,\"messageUuid\":\"5656565\",\"FW\":\"1\",\"ctrlCmdType\":\"0\",\"timing\":\"1634802625\"}",
+      "note": "对应上下文条目：PDU_direct_off直接关；用于确保进入放电前断电状态"
+    },
+    {
+      "order": 18,
+      "action": "运行ACin_auto_on.exe检测适配器插入行为并返回结果",
+      "tool": "ACinAutoOnWrap",
+      "params": "-r",
+      "note": "对应上下文条目：run ACin_auto_on.exe and pass the result"
+    },
+    {
+      "order": 19,
+      "action": "禁用板载有线网卡",
+      "tool": "ChangeLanStatus",
+      "params": "/S Disable",
+      "note": "对应上下文条目：Disable LAN"
+    },
+    {
+      "order": 20,
+      "action": "开始电池放电监测，目标电量3%，采样间隔60秒",
+      "tool": "BatteryCapacityDetectControl",
+      "params": "/A DisCharge /P 3 /T 60",
+      "note": "对应上下文条目：Battery life 放电电池监测；目标从100%到3%"
+    },
+    {
+      "order": 21,
+      "action": "重新设置系统壁纸为1-Think_White.jpg",
+      "tool": "ChangeOSBackgroundBattery",
+      "params": "/F 1-Think_White.jpg",
+      "note": "对应上下文条目：设置壁纸1-Think_White.jpg；用于恢复视觉一致性"
+    },
+    {
+      "order": 22,
+      "action": "启用板载有线网卡",
+      "tool": "ChangeLanStatus",
+      "params": "/S Enable",
+      "note": "对应上下文条目：Enable LAN"
+    },
+    {
+      "order": 23,
+      "action": "通过PDU对测试机执行硬上电以结束放电测试",
+      "tool": "DeviceNetRequest",
+      "params": "{\"testUnitUuid\":\"4899fbed58f\",\"times\":0,\"parentTestModelOperationUuid\":\"e0eeb774579f3788\",\"action\":\"poweron\",\"testModelNodeUuid\":\"7460c72717877d7\",\"testTaskCode\":\"TT200037\",\"controlCmd\":\"Direct\",\"cancel\":0,\"messageUuid\":\"5656565\",\"FW\":\"1\",\"ctrlCmdType\":\"0\",\"timing\":\"1634802625\"}",
+      "note": "对应上下文条目：PDU_direct_on直接开"
+    },
+    {
+      "order": 24,
+      "action": "抓取C盘根目录下的batterylife.log并上传至测试平台",
+      "tool": "BatteryLifeCollectionLog",
+      "params": "",
+      "note": "对应上下文条目：默认从C盘根目录抓取电池寿命日志文件batterylife.log文件上传到平台；工具无输入参数"
+    }
+  ]
+}

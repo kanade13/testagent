@@ -1,0 +1,33 @@
+# config.case.yaml — 专属配置（将 Case描述 提升为用例级字段）
+input: "./inf.xlsx"    # 改成实际路径
+sheet: 0
+output: "./out.json"
+per_case: false
+
+# 列名映射
+case_id: "Case名称"
+step_col: "序号"
+action_col: "测试步骤"
+tool_col: "测试工具"
+params_col: "参数"
+notes_col: "备注"
+
+# 不再把 Case描述 放进每个 step
+extra_cols: []
+
+# 处理合并单元格样式
+ffill_cols: ["Case名称", "Case描述"]
+
+drop_if_all_empty: ["测试步骤", "测试工具", "参数", "备注"]
+
+# 输出形状
+output_mode: "mapping"
+
+# 行为
+autostep: true
+infer_columns: false
+
+# 新增：把 Case描述 提升为用例级字段，并重命名为 case_desc
+case_level_cols: ["Case描述"]
+case_level_rename:
+  Case描述: "case_desc"
