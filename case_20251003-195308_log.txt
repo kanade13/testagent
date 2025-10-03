@@ -1,0 +1,432 @@
+
+[20251003-195346] INIT_PLAN
+{
+  "case_name": "Batterylife_Jeita_VPBTest_100_to_10",
+  "case_desc": "利用BatteryCapacityDetectControl工具记录电脑通过播放本地视频将电池电量从100%放电到10%所用的总时间并上传到测试平台",
+  "type": 1,
+  "steps": [
+    {
+      "order": 1,
+      "action": "Set Battery test setting",
+      "tool": "AutoSet",
+      "params": "-battery -TPG -Volume 10 -Brightness 88 -Restart -Testmode Enable",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3，设置电池测试环境"
+    },
+    {
+      "order": 2,
+      "action": "采集软硬件信息",
+      "tool": "CollectHardwareSoftwareInfo",
+      "params": "",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3，收集初始系统信息"
+    },
+    {
+      "order": 3,
+      "action": "移除 Microsoft 软件，包括 MS 365 App、OneNote、Visual C++、Windows Desktop Runtime",
+      "tool": "RemoveMicrosoftProgram",
+      "params": "-r",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3，清理非必要软件"
+    },
+    {
+      "order": 4,
+      "action": "卸载 OneDrive 应用",
+      "tool": "UninstallTeams",
+      "params": "/name \"OneDrive\"",
+      "note": "映射：Uninstall OneDrive app -> UninstallTeams，理由：工具根据应用名自动匹配"
+    },
+    {
+      "order": 5,
+      "action": "卸载 Microsoft Teams UWP 应用",
+      "tool": "UninstallTeams",
+      "params": "/name \"Teams\"",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 6,
+      "action": "设置系统屏幕亮度为 82%",
+      "tool": "SetBrightness",
+      "params": "/Brightness 82",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 7,
+      "action": "设置笔记本默认声卡音量为 0",
+      "tool": "SetComputerVolume",
+      "params": "/Volum 0",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 8,
+      "action": "设置系统壁纸为 1-Think_White.jpg",
+      "tool": "ChangeOSBackgroundBattery",
+      "params": "/F 1-Think_White.jpg",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 9,
+      "action": "通过 PDU 硬关机",
+      "tool": "DeviceNetRequest",
+      "params": "{\"testUnitUuid\":\"4899fbed58f\",\"times\":0,\"parentTestModelOperationUuid\":\"e0eeb774579f3788\",\"action\":\"poweroff\",\"testModelNodeUuid\":\"7460c72717877d7\",\"testTaskCode\":\"TT200037\",\"controlCmd\":\"Direct\",\"cancel\":0,\"messageUuid\":\"5656565\",\"FW\":\"1\",\"ctrlCmdType\":\"0\",\"timing\":\"1634802625\"}",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 10,
+      "action": "设置系统电源模式为 BestPowerEfficienct",
+      "tool": "SetPowerMode",
+      "params": "/P BestPowerEfficienct",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 11,
+      "action": "重启测试机",
+      "tool": "SxPowerTest",
+      "params": "--TestFunction Wb --TestTimes 1 --CountDownTime 10 --SleepTime 60 --CheckDeviceMode Nothing /X_SkipShutdown",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 12,
+      "action": "通过 PDU 硬开机",
+      "tool": "DeviceNetRequest",
+      "params": "{\"testUnitUuid\":\"4899fbed58f\",\"times\":0,\"parentTestModelOperationUuid\":\"e0eeb774579f3788\",\"action\":\"poweron\",\"testModelNodeUuid\":\"7460c72717877d7\",\"testTaskCode\":\"TT200037\",\"controlCmd\":\"Direct\",\"cancel\":0,\"messageUuid\":\"5656565\",\"FW\":\"1\",\"ctrlCmdType\":\"0\",\"timing\":\"1634802625\"}",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 13,
+      "action": "设置系统 DPI 缩放为 100%",
+      "tool": "ChangeSystemDPI",
+      "params": "/V New",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 14,
+      "action": "检查电池电量是否达到 100%",
+      "tool": "CheckBatteryLevel",
+      "params": "/Min 100",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 15,
+      "action": "使用 Media Player 循环播放本地视频",
+      "tool": "PlayLocalVideo",
+      "params": "-S Yes",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 16,
+      "action": "抓取 CPU 使用率并绘制曲线图，采样 5 秒",
+      "tool": "CPUUsage",
+      "params": "/TestDuration 5",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 17,
+      "action": "通过 PDU 硬关机",
+      "tool": "DeviceNetRequest",
+      "params": "{\"testUnitUuid\":\"4899fbed58f\",\"times\":0,\"parentTestModelOperationUuid\":\"e0eeb774579f3788\",\"action\":\"poweroff\",\"testModelNodeUuid\":\"7460c72717877d7\",\"testTaskCode\":\"TT200037\",\"controlCmd\":\"Direct\",\"cancel\":0,\"messageUuid\":\"5656565\",\"FW\":\"1\",\"ctrlCmdType\":\"0\",\"timing\":\"1634802625\"}",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 18,
+      "action": "运行 ACin_auto_on.exe 并传递结果",
+      "tool": "ACinAutoOnWrap",
+      "params": "-r",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 19,
+      "action": "禁用板载有线网卡",
+      "tool": "ChangeLanStatus",
+      "params": "/S Disable",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 20,
+      "action": "启动放电监测，目标电量 10%，采样间隔 60 秒",
+      "tool": "BatteryCapacityDetectControl",
+      "params": "/A DisCharge /P 10 /T 60",
+      "note": "推断：目标电量由 3% 改为 10%，参数调整自上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 21,
+      "action": "设置系统壁纸为 1-Think_White.jpg",
+      "tool": "ChangeOSBackgroundBattery",
+      "params": "/F 1-Think_White.jpg",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 22,
+      "action": "启用板载有线网卡",
+      "tool": "ChangeLanStatus",
+      "params": "/S Enable",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 23,
+      "action": "通过 PDU 硬开机",
+      "tool": "DeviceNetRequest",
+      "params": "{\"testUnitUuid\":\"4899fbed58f\",\"times\":0,\"parentTestModelOperationUuid\":\"e0eeb774579f3788\",\"action\":\"poweron\",\"testModelNodeUuid\":\"7460c72717877d7\",\"testTaskCode\":\"TT200037\",\"controlCmd\":\"Direct\",\"cancel\":0,\"messageUuid\":\"5656565\",\"FW\":\"1\",\"ctrlCmdType\":\"0\",\"timing\":\"1634802625\"}",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 24,
+      "action": "抓取并上传电池寿命日志文件 batterylife.log",
+      "tool": "BatteryLifeCollectionLog",
+      "params": "",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 25,
+      "action": "设置系统壁纸为 1-Think_White.jpg",
+      "tool": "ChangeOSBackgroundBattery",
+      "params": "/F 1-Think_White.jpg",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 26,
+      "action": "启动充放电循环监测，恢复至 100%",
+      "tool": "BatteryCapacityDetectControl",
+      "params": "/A Charge /P 100 /T 60",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 27,
+      "action": "再次抓取并上传电池寿命日志文件 batterylife.log",
+      "tool": "BatteryLifeCollectionLog",
+      "params": "",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    }
+  ]
+}
+
+[20251003-195403] USER_INPUT_STAGE1
+第20步,改为放电到5%
+
+[20251003-195412] USER_INPUT_STAGE1
+<confirm>
+
+[20251003-195412] EDITED_PLAN_AFTERSTAGE1
+{
+  "case_name": "Batterylife_Jeita_VPBTest_100_to_10",
+  "case_desc": "利用BatteryCapacityDetectControl工具记录电脑通过播放本地视频将电池电量从100%放电到10%所用的总时间并上传到测试平台",
+  "type": 2,
+  "steps": [
+    {
+      "order": 1,
+      "action": "Set Battery test setting",
+      "tool": "AutoSet",
+      "params": "-battery -TPG -Volume 10 -Brightness 88 -Restart -Testmode Enable",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3，设置电池测试环境"
+    },
+    {
+      "order": 2,
+      "action": "采集软硬件信息",
+      "tool": "CollectHardwareSoftwareInfo",
+      "params": "",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3，收集初始系统信息"
+    },
+    {
+      "order": 3,
+      "action": "移除 Microsoft 软件，包括 MS 365 App、OneNote、Visual C++、Windows Desktop Runtime",
+      "tool": "RemoveMicrosoftProgram",
+      "params": "-r",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3，清理非必要软件"
+    },
+    {
+      "order": 4,
+      "action": "卸载 OneDrive 应用",
+      "tool": "UninstallTeams",
+      "params": "/name \"OneDrive\"",
+      "note": "映射：Uninstall OneDrive app -> UninstallTeams，理由：工具根据应用名自动匹配"
+    },
+    {
+      "order": 5,
+      "action": "卸载 Microsoft Teams UWP 应用",
+      "tool": "UninstallTeams",
+      "params": "/name \"Teams\"",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 6,
+      "action": "设置系统屏幕亮度为 82%",
+      "tool": "SetBrightness",
+      "params": "/Brightness 82",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 7,
+      "action": "设置笔记本默认声卡音量为 0",
+      "tool": "SetComputerVolume",
+      "params": "/Volum 0",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 8,
+      "action": "设置系统壁纸为 1-Think_White.jpg",
+      "tool": "ChangeOSBackgroundBattery",
+      "params": "/F 1-Think_White.jpg",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 9,
+      "action": "通过 PDU 硬关机",
+      "tool": "DeviceNetRequest",
+      "params": "{\"testUnitUuid\":\"4899fbed58f\",\"times\":0,\"parentTestModelOperationUuid\":\"e0eeb774579f3788\",\"action\":\"poweroff\",\"testModelNodeUuid\":\"7460c72717877d7\",\"testTaskCode\":\"TT200037\",\"controlCmd\":\"Direct\",\"cancel\":0,\"messageUuid\":\"5656565\",\"FW\":\"1\",\"ctrlCmdType\":\"0\",\"timing\":\"1634802625\"}",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 10,
+      "action": "设置系统电源模式为 BestPowerEfficienct",
+      "tool": "SetPowerMode",
+      "params": "/P BestPowerEfficienct",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 11,
+      "action": "重启测试机",
+      "tool": "SxPowerTest",
+      "params": "--TestFunction Wb --TestTimes 1 --CountDownTime 10 --SleepTime 60 --CheckDeviceMode Nothing /X_SkipShutdown",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 12,
+      "action": "通过 PDU 硬开机",
+      "tool": "DeviceNetRequest",
+      "params": "{\"testUnitUuid\":\"4899fbed58f\",\"times\":0,\"parentTestModelOperationUuid\":\"e0eeb774579f3788\",\"action\":\"poweron\",\"testModelNodeUuid\":\"7460c72717877d7\",\"testTaskCode\":\"TT200037\",\"controlCmd\":\"Direct\",\"cancel\":0,\"messageUuid\":\"5656565\",\"FW\":\"1\",\"ctrlCmdType\":\"0\",\"timing\":\"1634802625\"}",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 13,
+      "action": "设置系统 DPI 缩放为 100%",
+      "tool": "ChangeSystemDPI",
+      "params": "/V New",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 14,
+      "action": "检查电池电量是否达到 100%",
+      "tool": "CheckBatteryLevel",
+      "params": "/Min 100",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 15,
+      "action": "使用 Media Player 循环播放本地视频",
+      "tool": "PlayLocalVideo",
+      "params": "-S Yes",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 16,
+      "action": "抓取 CPU 使用率并绘制曲线图，采样 5 秒",
+      "tool": "CPUUsage",
+      "params": "/TestDuration 5",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 17,
+      "action": "通过 PDU 硬关机",
+      "tool": "DeviceNetRequest",
+      "params": "{\"testUnitUuid\":\"4899fbed58f\",\"times\":0,\"parentTestModelOperationUuid\":\"e0eeb774579f3788\",\"action\":\"poweroff\",\"testModelNodeUuid\":\"7460c72717877d7\",\"testTaskCode\":\"TT200037\",\"controlCmd\":\"Direct\",\"cancel\":0,\"messageUuid\":\"5656565\",\"FW\":\"1\",\"ctrlCmdType\":\"0\",\"timing\":\"1634802625\"}",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 18,
+      "action": "运行 ACin_auto_on.exe 并传递结果",
+      "tool": "ACinAutoOnWrap",
+      "params": "-r",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 19,
+      "action": "禁用板载有线网卡",
+      "tool": "ChangeLanStatus",
+      "params": "/S Disable",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 20,
+      "action": "Battery life 放电电池监测",
+      "tool": "BatteryCapacityDetectControl",
+      "params": "/A DisCharge /P 5 /T 60",
+      "note": "对应上下文条目：Battery life 放电电池监测，原目标电量为3%，现按用户要求修改为5%"
+    },
+    {
+      "order": 21,
+      "action": "设置系统壁纸为 1-Think_White.jpg",
+      "tool": "ChangeOSBackgroundBattery",
+      "params": "/F 1-Think_White.jpg",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 22,
+      "action": "启用板载有线网卡",
+      "tool": "ChangeLanStatus",
+      "params": "/S Enable",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 23,
+      "action": "通过 PDU 硬开机",
+      "tool": "DeviceNetRequest",
+      "params": "{\"testUnitUuid\":\"4899fbed58f\",\"times\":0,\"parentTestModelOperationUuid\":\"e0eeb774579f3788\",\"action\":\"poweron\",\"testModelNodeUuid\":\"7460c72717877d7\",\"testTaskCode\":\"TT200037\",\"controlCmd\":\"Direct\",\"cancel\":0,\"messageUuid\":\"5656565\",\"FW\":\"1\",\"ctrlCmdType\":\"0\",\"timing\":\"1634802625\"}",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 24,
+      "action": "抓取并上传电池寿命日志文件 batterylife.log",
+      "tool": "BatteryLifeCollectionLog",
+      "params": "",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 25,
+      "action": "设置系统壁纸为 1-Think_White.jpg",
+      "tool": "ChangeOSBackgroundBattery",
+      "params": "/F 1-Think_White.jpg",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 26,
+      "action": "启动充放电循环监测，恢复至 100%",
+      "tool": "BatteryCapacityDetectControl",
+      "params": "/A Charge /P 100 /T 60",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    },
+    {
+      "order": 27,
+      "action": "再次抓取并上传电池寿命日志文件 batterylife.log",
+      "tool": "BatteryLifeCollectionLog",
+      "params": "",
+      "note": "对应上下文条目：Batterylife_Jeita_VPBTest_100_to_3"
+    }
+  ]
+}
+
+[20251003-195413] USER_INPUT_STEP1
+<confirm>
+
+[20251003-195413] EXEC_RESULT_STEP1
+success=True
+
+[20251003-195414] USER_INPUT_STEP2
+<confirm>
+
+[20251003-195414] EXEC_RESULT_STEP2
+success=True
+
+[20251003-195415] USER_INPUT_STEP3
+<confirm>
+
+[20251003-195415] EXEC_RESULT_STEP3
+success=True
+
+[20251003-195415] USER_INPUT_STEP4
+<confirm>
+
+[20251003-195416] EXEC_RESULT_STEP4
+success=True
+
+[20251003-195416] USER_INPUT_STEP5
+<confirm>
+
+[20251003-195417] EXEC_RESULT_STEP5
+success=True

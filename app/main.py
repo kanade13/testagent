@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from .api import router as http_router
 from .api_ws import router_ws as ws_router
 from .core.config import settings
-
+from dotenv import load_dotenv
+load_dotenv()  # 自动加载 .env 文件
 app = FastAPI(title=settings.PROJECT_NAME)
 
 # HTTP 路由

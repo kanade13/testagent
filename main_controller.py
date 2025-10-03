@@ -12,15 +12,7 @@ from jsonschema import validate, ValidationError
 from step import run_plan_chat,save_plan_to_json, load_context_json, CTX_PATH, PLAN_SCHEMA
 
 from utils import json_pretty, now_ts, extract_first_json_blob, check_json_format,validate_plan,write_log
-from typing import Optional, Dict, Any
-from app.services.prompt_io import AsyncPromptIO  # 交互接口
 
-import anyio
-# 自动加载 .env 文件
-load_dotenv()
-
-base_url = os.getenv("OPENAI_BASE_URL")
-api_key = os.getenv("OPENAI_API_KEY")
 CTX_PATH = pathlib.Path("./context.json")
 CONTEXT_JSON = load_context_json(CTX_PATH)
 # ----------- Command Parser Agent -----------
@@ -43,11 +35,7 @@ CMD_SCHEMA = {
     },
     "required": ["op"]
 }
-def _find_step_index_by_order(plan: Dict[str, Any], order: int) -> Optional[int]:
-    for idx, step in enumerate(plan.get("steps", [])):
-        if step.get("order") == order:
-            return idx
-    return None
+
 def parse_command_with_llm(client: OpenAI, model: str, user_text: str, plan: Dict[str, Any], current_step: int,context_json:str) -> Dict[str, Any]:
     """
     使用 LLM 将自然语言 user_text 解析为结构化命令，遵循 CMD_SCHEMA。
@@ -171,32 +159,21 @@ def execute_step(step_obj: Dict[str, Any]) -> bool:
     return True
 
 # ----------- 阶段1：原样输出计划并等待确认/修改 -----------
-# 修改：增加 prompt_io 参数；改为 async；把 print/input 改成 prompt_io
-async def stage1_show_and_confirm(
-    client: OpenAI,
-    model: str,
-    plan: Dict[str, Any],
-    log_path: pathlib.Path,
-    context_json: str,
-    prompt_io
-) -> Dict[str, Any]:
-    await prompt_io.notify("===== 阶段1：原样输出测试执行计划（等待确认/修改） =====")
-    await prompt_io.notify(json_pretty(plan))
-    await prompt_io.notify(
-        "请输入指令：\n"
-        " - 直接回车：视为 confirm\n"
-        " - 自然语言说明：例如“第2步把亮度改成60再说”、“跳到第3步看看”、“先别执行，我有问题：XXX”\n"
-        " - 关键词也行：confirm/skip/goto/edit/stop/ask"
-    )
+def stage1_show_and_confirm(client: OpenAI, model: str, plan: Dict[str, Any],log_path:pathlib.Path,context_json:str) -> Dict[str, Any]:
+    print("\n===== 阶段1：原样输出测试执行计划（等待确认/修改） =====")
+    print(json_pretty(plan))
+    print("\n请输入指令：\n"
+          " - 直接回车：视为 confirm\n"
+          " - 自然语言说明：例如“第2步把亮度改成60再说”、“跳到第3步看看”、“先别执行，我有问题：XXX”\n"
+          " - 关键词也行：confirm/skip/goto/edit/stop/ask\n")
 
     while True:
-        user_text = await prompt_io.ask("你的指令（阶段1）", key="stage1_cmd", default="")
+        user_text = input("你的指令（阶段1）：").strip()
         write_log(log_path, "USER_INPUT_STAGE1", user_text if user_text else "<confirm>")
         if user_text == "":
-            # 视为确认
-            return plan
+            return plan  # 视为确认
 
-        cmd = await parse_command_with_llm_async(client, model, user_text, plan, current_step=1, context_json=context_json)
+        cmd = parse_command_with_llm(client, model, user_text, plan,current_step=1,context_json=context_json)
         op = cmd["op"]
 
         if op == "confirm":
@@ -206,8 +183,9 @@ async def stage1_show_and_confirm(
             raise KeyboardInterrupt("用户停止执行。")
 
         elif op == "ask":
-            t = cmd.get("target_step")
-            ans = await answer_user_question_async(
+            # 可能带有 target_step（按步骤号），也可能没有
+            t = cmd.get("target_step")  # None 或 int
+            ans = answer_user_question(
                 client=client,
                 model=model,
                 question=cmd.get("message", ""),
@@ -215,41 +193,41 @@ async def stage1_show_and_confirm(
                 context_json=context_json,
                 target_step=t
             )
-            await prompt_io.notify(f"[答复] {ans}")
+            print(f"[答复] {ans}")
 
         elif op == "edit":
             t = cmd.get("target_step", 0)
             edits = cmd.get("edits", {})
+            # 简化：阶段1允许编辑任意步骤（按 order 定位）
             idx = _find_step_index_by_order(plan, t)
             if idx is None:
-                await prompt_io.notify(f"[警告] 未找到步骤 {t}")
+                print(f"[警告] 未找到步骤 {t}")
                 continue
             plan["steps"][idx].update({k: v for k, v in edits.items() if v is not None})
-            ok, err = validate_plan(plan, PLAN_SCHEMA)
+            ok, err = validate_plan(plan,PLAN_SCHEMA)
             if not ok:
-                await prompt_io.notify(f"[校验失败] {err}")
+                print(f"[校验失败] {err}")
             else:
-                await prompt_io.notify("[已修改并通过校验]")
-                await prompt_io.notify(json_pretty(plan["steps"][idx]))
+                print("[已修改并通过校验]")
+                print(json_pretty(plan["steps"][idx]))
 
         elif op in ("skip", "goto"):
-            await prompt_io.notify("[提示] 阶段1仅用于确认/总体编辑，不进行逐步控制。若要跳过/跳转，请进入阶段2后处理。")
+            print("[提示] 阶段1仅用于确认/总体编辑，不进行逐步控制。若要跳过/跳转，请进入阶段2后处理。")
 
         else:
-            await prompt_io.notify("[提示] 请输入更明确的意图（confirm/edit/ask/stop）。")
+            print("[提示] 请输入更明确的意图（confirm/edit/ask/stop）。")
 
+
+def _find_step_index_by_order(plan: Dict[str, Any], order: int) -> Optional[int]:
+    for i, s in enumerate(plan.get("steps", [])):
+        if s.get("order") == order:
+            return i
+    return None
 
 # ----------- 阶段2：逐步执行（每步前等待确认/可编辑/跳过/跳转/问答/停止）-----------
-async def stage2_stepwise_execute(
-    client: OpenAI,
-    model: str,
-    plan: Dict[str, Any],
-    log_path: pathlib.Path,
-    context_json: str,
-    prompt_io
-) -> None:
-    await prompt_io.notify("===== 阶段2：逐步执行 =====")
-    # 按 order 排序
+def stage2_stepwise_execute(client: OpenAI, model: str, plan: Dict[str, Any],log_path:pathlib.Path,context_json:str) -> None:
+    print("\n===== 阶段2：逐步执行 =====")
+    # 确保 steps 按 order 升序
     plan["steps"].sort(key=lambda x: x["order"])
     i = 0
     n = len(plan["steps"])
@@ -258,62 +236,65 @@ async def stage2_stepwise_execute(
         step = plan["steps"][i]
         order = step["order"]
 
-        await prompt_io.notify("\n--- 即将执行的步骤 ---")
-        await prompt_io.notify(json_pretty(step))
+        print("\n--- 即将执行的步骤 ---")
+        print(json_pretty(step))
+        print("\n请输入指令（回车=confirm）")
 
-        user_text = await prompt_io.ask(f"你的指令（当前步骤{order}）", key=f"stage2_cmd_{order}", default="")
+        user_text = input(f"你的指令（当前步骤{order}）：").strip()
         write_log(log_path, f"USER_INPUT_STEP{order}", user_text if user_text else "<confirm>")
-
         if user_text == "":
-            ok = await execute_step_async(step)
+            # 直接确认执行
+            ok = execute_step(step)
             write_log(log_path, f"EXEC_RESULT_STEP{order}", f"success={ok}")
             if not ok:
-                await prompt_io.notify("[失败] 执行失败")
+                print("[失败] 执行失败")
+                write_log(log_path, f"EXEC_RESULT_STEP{order}", f"success={ok}")
                 continue
             i += 1
             continue
 
-        cmd = await parse_command_with_llm_async(client, model, user_text, plan, current_step=order, context_json=context_json)
+        # 解析自然语言为命令
+        cmd = parse_command_with_llm(client, model, user_text, plan, current_step=order,context_json=context_json)
         op = cmd["op"]
 
         if op == "confirm":
-            ok = await execute_step_async(step)
+            ok = execute_step(step)
             write_log(log_path, f"EXEC_RESULT_STEP{order}", f"success={ok}")
             if ok:
                 i += 1
             continue
 
         if op == "stop":
-            await prompt_io.notify("[已停止] 用户要求终止")
-            write_log(log_path, f"EXEC_RESULT_STEP{order}", "用户暂停")
+            print("[已停止] 用户要求终止")
+            write_log(log_path, f"EXEC_RESULT_STEP{order}", f"用户暂停")
             return
 
         if op == "skip":
-            await prompt_io.notify(f"[跳过] 步骤 {order}")
-            write_log(log_path, f"EXEC_RESULT_STEP{order}", "用户跳过")
+            print(f"[跳过] 步骤 {order}")
+            write_log(log_path, f"EXEC_RESULT_STEP{order}", f"用户跳过")
             i += 1
             continue
 
         if op == "goto":
             t = cmd.get("target_step")
             if not isinstance(t, int):
-                await prompt_io.notify("[提示] 请提供要跳转的目标步骤号 target_step")
-                write_log(log_path, f"EXEC_RESULT_STEP{order}", "用户跳转失败，未提供目标步骤号")
+                print("[提示] 请提供要跳转的目标步骤号 target_step")
+                write_log(log_path, f"EXEC_RESULT_STEP{order}", f"用户跳转失败，未提供目标步骤号")
                 continue
             idx = _find_step_index_by_order(plan, t)
             if idx is None:
-                await prompt_io.notify(f"[警告] 未找到步骤 {t}")
+                print(f"[警告] 未找到步骤 {t}")
                 write_log(log_path, f"EXEC_RESULT_STEP{order}", f"用户跳转失败，未找到步骤 {t}")
                 continue
             i = idx
-            await prompt_io.notify(f"[跳转] 到步骤 {t}")
+            print(f"[跳转] 到步骤 {t}")
             write_log(log_path, f"EXEC_RESULT_STEP{order}", f"用户跳转到 {t}")
             continue
 
         if op == "ask":
             q = cmd.get("message", "")
-            ans = await answer_user_question_async(client, model, q, plan, context_json, target_step=order)
-            await prompt_io.notify(f"[答复] {ans}")
+            ans = answer_user_question(client, model, q, plan, step, context_json=context_json)
+            print(f"[答复] {ans}")
             write_log(log_path, f"EXEC_RESULT_STEP{order}", f"用户询问：{q}\n答复：{ans}")
             continue
 
@@ -321,7 +302,7 @@ async def stage2_stepwise_execute(
             t = cmd.get("target_step", order)
             idx = _find_step_index_by_order(plan, t)
             if idx is None:
-                await prompt_io.notify(f"[警告] 未找到步骤 {t}")
+                print(f"[警告] 未找到步骤 {t}")
                 write_log(log_path, f"EXEC_RESULT_STEP{order}", f"用户编辑失败，未找到步骤 {t}")
                 continue
             edits = cmd.get("edits", {})
@@ -329,15 +310,19 @@ async def stage2_stepwise_execute(
             plan["steps"][idx].update({k: v for k, v in edits.items() if v is not None})
             ok, err = validate_plan(plan)
             if not ok:
-                await prompt_io.notify(f"[校验失败] {err}\n[回滚] 还原修改。")
+                print(f"[校验失败] {err}\n[回滚] 还原修改。")
                 write_log(log_path, f"EXEC_RESULT_STEP{order}", f"用户编辑步骤 {t} 失败，错误：{err}")
                 plan["steps"][idx] = before
                 continue
+            # 保存修改后的计划（带时间戳）
+            #_backup_and_save(plan, save_path)
+            #print("[已修改并保存] 当前步骤内容：")
+            #print(json_pretty(plan["steps"][idx]))
+            # 修改后一般仍停留在同一步，等待用户再次确认或继续
             write_log(log_path, f"EXEC_RESULT_STEP{order}", f"用户编辑步骤 {t}，修改内容：{json.dumps(edits, ensure_ascii=False)}")
             continue
 
-    await prompt_io.notify("===== 阶段2结束：已到达计划末尾 =====")
-
+    print("\n===== 阶段2结束：已到达计划末尾 =====")
     
 def _backup_and_save(plan: Dict[str, Any], save_path: pathlib.Path) -> None:
     if save_path.exists():
@@ -348,102 +333,53 @@ def _backup_and_save(plan: Dict[str, Any], save_path: pathlib.Path) -> None:
     print(f"[保存] 已写回 {save_path.name}")
 
 # ----------- 总控入口 -----------
-# 保持 async，并把 prompt_io 设为必传
-async def run_test_case( 
+def run_test_case(
     case_name: str,
     case_desc: str,
-    context_json: str,
-    model: str = "qwen-plus",
+    context_json:str,
+    model: str = "qwen3-235b-a22b-instruct-2507",
     max_retries: int = 3,
-    context: Optional[Dict[str, Any]] = None,
-    prompt_io = None,   # ← 必须传 WebSocketPromptIO
-) -> Any:
-    if prompt_io is None:
-        raise RuntimeError("Interactive mode required: prompt_io must be provided via WebSocket.")
-
+    context: Optional[Dict[str, Any]] = None) -> None:
+    #我服了我怎么定义了两个context
     client = OpenAI()
-
-    # 你注释里提到“我怎么定义了两个context”
-    # 这里把外部传入的 context 优先；若没有，则从 context_json 或本地加载
-    if context is None:
-        if context_json:
-            try:
-                context = json.loads(context_json)
-            except Exception:
-                # 如果传入的是“用于 LLM 提示词的上下文字符串”，而不是结构化 JSON
-                # 那就退化为空 dict，避免名称冲突
-                context = {}
-        else:
-            context = load_context_json()  # 你已有的函数
-
+    # 上下文
+    context = context or load_context_json()
     context_json_str = json.dumps(context, ensure_ascii=False)
 
-    # 日志文件
-    if not case_name:
-        case_name = "case"
+    #日志文件
+    if case_name == "":
+        case_name = f"case"
     log_path = pathlib.Path(f"{case_name}_{now_ts()}_log.txt")
-
-    # 1) 生成计划（如果 run_plan_chat 是阻塞的，可用 anyio.to_thread 包装）
-    plan = await anyio.to_thread.run_sync(
-        run_plan_chat,
-        case_name,
-        case_desc,
-        context_json_str,
-        model,
-        max_retries
+    #print(165)
+    # 1) 生成计划
+    plan = run_plan_chat(
+        case_name=case_name,
+        case_desc=case_desc,
+        context_json=context_json_str,
+        model=model,
+        max_retries=max_retries
     )
-
-    # 2) 校验 & 记录
-    ok, err = validate_plan(plan, PLAN_SCHEMA)
+    #print(165)
+    # 2) 校验 & 保存
+    ok, err = validate_plan(plan,PLAN_SCHEMA)
     if not ok:
-        await prompt_io.notify("[错误] 生成的计划不符合 SCHEMA：")
-        await prompt_io.notify(str(err))
-        return {"status": "invalid_plan", "error": str(err)}
+        print("[错误] 生成的计划不符合 SCHEMA：")
+        print(err)
+        return
 
     write_log(log_path, "INIT_PLAN", json_pretty(plan))
 
     # 3) 阶段1：展示计划并等待确认/编辑
-    plan = await stage1_show_and_confirm(client, model, plan, log_path, context_json_str, prompt_io)
-    plan["type"] = 2
+    plan = stage1_show_and_confirm(client, model, plan,log_path,context_json=context_json_str)
+    #_backup_and_save(plan, save_path)
+    #将type改为2
+    plan["type"]=2
     write_log(log_path, "EDITED_PLAN_AFTERSTAGE1", json_pretty(plan))
-    await prompt_io.notify("\n[信息] 进入阶段2：逐步执行")
+    print("\n[信息] 进入阶段2：逐步执行")
+
 
     # 4) 阶段2：逐步执行
-    await stage2_stepwise_execute(client, model, plan, log_path, context_json_str, prompt_io)
-
-    # 你也可以在这里返回结构化结果（比如最终报告/统计）
-    return {"status": "finished", "case_name": case_name}
-
-
-
-# 我们新增一个异步包装器，在线程池里调用它
-async def parse_command_with_llm_async(client: OpenAI, model: str, user_text: str,
-                                       plan: Dict[str, Any], current_step: int,
-                                       context_json: str) -> Dict[str, Any]:
-    return await anyio.to_thread.run_sync(
-        parse_command_with_llm, client, model, user_text, plan, current_step, context_json
-    )
-
-# 同理，给 answer_user_question 做一个异步包装
-async def answer_user_question_async(
-    client: OpenAI,
-    model: str,
-    question: str,
-    plan: Dict[str, Any],
-    context_json: str,
-    target_step: Optional[int]
-) -> str:
-    def _call():
-        # 直接调用你原来的同步实现
-        return answer_user_question(client, model, question, plan, context_json, target_step)
-    return await anyio.to_thread.run_sync(_call)
-
-# 执行一步（如果里面会阻塞），也丢到线程池
-async def execute_step_async(step_obj: Dict[str, Any]) -> bool:
-    def _call():
-        return execute_step(step_obj)
-    return await anyio.to_thread.run_sync(_call)
-
+    stage2_stepwise_execute(client, model, plan, log_path,context_json=context_json_str)
 
 # ---- 直接运行示例 ----
 if __name__ == "__main__":

@@ -6,6 +6,15 @@ from typing import Dict, Any, List
 
 from openai import OpenAI
 from jsonschema import validate, ValidationError
+from dotenv import load_dotenv
+
+
+env_path = pathlib.Path(__file__).parent / ".env"
+#print("加载路径:", env_path)
+load_dotenv(dotenv_path=env_path)
+
+#print("API_KEY=", os.getenv("OPENAI_API_KEY"))
+
 
 client = OpenAI()  # 默认从环境变量读取 key / base_url
 
@@ -14,11 +23,10 @@ CTX_PATH = pathlib.Path("./context.json")
 # 是否自动修复 steps.order 连续性
 AUTO_FIX_ORDER = True
 
-# ===================== 新的更“泛化”的 System Prompt =====================
 SYSTEM_PROMPT = """
 你是一名“测试执行规划器（Test Planner）”。你只能依据“上下文JSON”中的**事实**来规划步骤，
 但你应尽量让步骤具备**可迁移性与泛化性**。禁止编造上下文之外**不存在**的工具或参数值。
-
+另外,当你找到可能有关联的上下文时,注意查看其步骤数目,因为**很可能**该上下文是针对类似case的规划,你可以参考其步骤数目来规划你的步骤数目.
 【角色与目标】
 - 你的任务是把一个“Case（case_name, case_desc）”转换为一组**可执行、可迁移**的步骤（steps）。
 - 当 case 的描述与上下文中的示例不完全一致时，应进行**语义对齐**与**抽象化**：

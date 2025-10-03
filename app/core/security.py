@@ -1,10 +1,9 @@
-from fastapi import WebSocket, status
+from fastapi import Header, HTTPException, status
 from .config import settings
 
-async def verify_ws_api_key(ws: WebSocket) -> bool:
-    # WebSocket 不能像 HTTP 路由那样直接用 Depends，所以用 query 参数校验
-    api_key = ws.query_params.get("api_key")
-    if settings.API_KEY and api_key != settings.API_KEY:
-        await ws.close(code=status.WS_1008_POLICY_VIOLATION)  # 1008: policy violation
-        return False
-    return True
+async def verify_api_key(x_api_key: str | None = Header(default=None)):
+    if settings.API_KEY and x_api_key != settings.API_KEY:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid API Key"
+        )
