@@ -36,7 +36,7 @@ CMD_SCHEMA = {
     "required": ["op"]
 }
 
-def parse_command_with_llm(client: OpenAI, model: str, user_text: str, plan: Dict[str, Any], current_step: int,context_json:str) -> Dict[str, Any]:
+def parse_command_with_llm(client: OpenAI, model: str, user_text: str, plan: Dict[str, Any], current_step: Optional[int],context_json:str) -> Dict[str, Any]:
     """
     使用 LLM 将自然语言 user_text 解析为结构化命令，遵循 CMD_SCHEMA。
     """
@@ -51,12 +51,12 @@ def parse_command_with_llm(client: OpenAI, model: str, user_text: str, plan: Dic
 用户输入（自然语言）：
 {user_text}
 
-当前步骤序号（1-based）：{current_step}
+
 
 计划概要（供理解，不必复述）：
 case_name: {plan.get('case_name')}
 steps_count: {len(plan.get('steps', []))}
-
+当前步骤: {current_step if current_step is not None else '不限制到单独步骤,请关注整体计划'}
 请只输出一个 JSON，字段含义：
 - op:  ["confirm", "edit", "skip", "goto", "stop", "ask"]的其中一个
 - target_step: integer, 当用户想跳转,编辑指定步骤或者询问指定步骤时需要,当用户询问或操作整个case时取值0
@@ -173,7 +173,7 @@ def stage1_show_and_confirm(client: OpenAI, model: str, plan: Dict[str, Any],log
         if user_text == "":
             return plan  # 视为确认
 
-        cmd = parse_command_with_llm(client, model, user_text, plan,current_step=1,context_json=context_json)
+        cmd = parse_command_with_llm(client=client, model=model, user_text=user_text, plan=plan,context_json=context_json)
         op = cmd["op"]
 
         if op == "confirm":
