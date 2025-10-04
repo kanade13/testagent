@@ -1,2 +1,9 @@
 fastapi==0.114.2
 uvicorn[standard]==0.30.6
+openai
+jsonschema
+python-dotenv
+websockets
+pandas
+openpyxl
+pyyaml

@@ -126,8 +126,12 @@ def fix_orders_inplace(steps: List[Dict[str, Any]]) -> None:
 def run_plan_chat(case_name: str,
                   case_desc: str,
                   context_json: str,
-                  model: str = "gpt-5",
+                  model: str = "qwen-max",
                   max_retries: int = 3) -> Dict[str, Any]:
+    
+    print(f"🤖 调用LLM生成测试计划...")
+    print(f"   - 模型: {model}")
+    print(f"   - 端点: {client.base_url}")
 
     user_context = "【上下文JSON】\n" + context_json
     task = json.dumps({"cmd": case_name, "cmd_desc": case_desc}, ensure_ascii=False)
@@ -169,7 +173,7 @@ def run_plan_chat(case_name: str,
 
         except Exception as e:
             last_err = e
-            print(f"第 {attempt}/{max_retries} 次失败：{e}")
+            print(f"❌ 第 {attempt}/{max_retries} 次失败：{e}")
             time.sleep(1)
 
     raise RuntimeError(f"重试后仍失败：{last_err}")
