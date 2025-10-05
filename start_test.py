@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+#start_test.py
 """
 测试启动脚本
 用于启动FastAPI服务器并测试WebSocket交互

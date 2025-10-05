@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# test_websocket_client.py
 """
 WebSocket 客户端测试脚本
 用于测试与testagent WebSocket接口的交互
@@ -8,12 +9,13 @@ import websockets
 import json
 
 async def test_websocket_interaction():
-    uri = "ws://localhost:8000/ws/case"
+    uri = "ws://localhost:8000/ws/case?api_key=ustc"
     
     try:
         async with websockets.connect(uri) as websocket:
             print("✅ WebSocket连接已建立")
-            
+            #先发送auth消息
+
             # 1. 发送启动消息
             start_message = {
                 "type": "start",
