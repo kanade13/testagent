@@ -126,7 +126,7 @@ def fix_orders_inplace(steps: List[Dict[str, Any]]) -> None:
 def run_plan_chat(case_name: str,
                   case_desc: str,
                   context_json: str,
-                  model: str = "qwen-max",
+                  model: str = "qwen3-235b-a22b-instruct-2507",
                   max_retries: int = 3) -> Dict[str, Any]:
     
     print(f"🤖 调用LLM生成测试计划...")

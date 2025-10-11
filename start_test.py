@@ -29,14 +29,16 @@ def start_server():
         env["PYTHONPATH"] = "."
         
         # 启动uvicorn服务器
-        cmd = [sys.executable, "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+        cmd = [sys.executable, "-m", "uvicorn", "app.main:app",
+       "--host", "0.0.0.0", "--port", "24000", "--reload"]
+
         print(f"执行命令: {' '.join(cmd)}")
         
         process = subprocess.Popen(cmd, env=env)
         print(f"✅ 服务器已启动，PID: {process.pid}")
-        print("📝 服务器地址: http://localhost:8000")
-        print("📝 WebSocket地址: ws://localhost:8000/ws/case")
-        print("📝 API文档: http://localhost:8000/docs")
+        print("📝 服务器地址: http://localhost:24000")
+        print("📝 WebSocket地址: ws://localhost:24000/ws/case")
+        print("📝 API文档: http://localhost:24000/docs")
         
         return process
     except Exception as e:
@@ -47,7 +49,7 @@ def main():
     print("=== TestAgent WebSocket 交互测试 ===\n")
     
     # 检查依赖
-    install_dependencies()
+    #install_dependencies()
     
     # 启动服务器
     server_process = start_server()
