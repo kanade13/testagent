@@ -37,6 +37,8 @@ CMD_SCHEMA = {
 }
 
 def parse_command_with_llm(client: OpenAI, model: str, user_text: str, plan: Dict[str, Any], current_step: int,context_json:str) -> Dict[str, Any]:
+    #print("plan:",plan)
+    #print("user_text:",user_text)
     """
     使用 LLM 将自然语言 user_text 解析为结构化命令，遵循 CMD_SCHEMA。
     """
@@ -53,9 +55,8 @@ def parse_command_with_llm(client: OpenAI, model: str, user_text: str, plan: Dic
 
 当前步骤序号（1-based）：{current_step}
 
-计划概要（供理解，不必复述）：
-case_name: {plan.get('case_name')}
-steps_count: {len(plan.get('steps', []))}
+请仔细阅读目前的计划（供理解，不必复述）：
+case_name: {plan}
 
 请只输出一个 JSON，字段含义：
 - op:  ["confirm", "edit", "skip", "goto", "stop", "ask"]的其中一个
@@ -122,9 +123,8 @@ def answer_user_question(
     USER_PROMPT = (
         "请直接回答问题，若涉及参数意义或修改建议，请给出明确理由和可选值。\n"
         f"用户问题：{question}\n\n"
-        "参考上下文：\n"
-        f"- Case：{plan.get('case_name')}\n"
-        f"- Desc：{plan.get('case_desc')}\n"
+        "目前的计划：\n"
+        f"{json.dumps(plan, ensure_ascii=False, indent=2)}\n"
     )
 
     # 若提供了目标步骤号，则追加该步骤的详细信息

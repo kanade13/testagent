@@ -9,6 +9,9 @@ class CaseInput(BaseModel):
     model: str = Field("qwen3-235b-a22b-instruct-2507", description="使用的模型")
     max_retries: int = Field(3, description="最大重试次数")
     context: Optional[Dict[str, Any]] = Field(None, description="可选上下文信息")
+    user_text: Optional[str] = Field(None, description="用户命令或问题")
+    plan: Optional[Dict[str, Any]] = Field(None, description="当前的测试计划")
+    target_step: Optional[int] = Field(None, description="目标步骤号")
 
 # ========== 响应模型 ==========
 class ExecResult(BaseModel):

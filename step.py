@@ -122,7 +122,42 @@ def check_order_continuity(steps: List[Dict[str, Any]]) -> bool:
 def fix_orders_inplace(steps: List[Dict[str, Any]]) -> None:
     for idx, step in enumerate(steps, start=1):
         step["order"] = idx
+def extract_thinking_from_completion(resp) -> str | None:
+    # 1) 先尝试从 pydantic 模型 dump（部分版本会保留额外字段）
+    raw = None
+    for dumper in ("model_dump", "dict"):
+        if hasattr(resp, dumper):
+            try:
+                raw = getattr(resp, dumper)(exclude_none=False)  # type: ignore
+                break
+            except Exception:
+                pass
 
+    # 2) 如果 dump 失败，尝试拿“原始响应”（部分 SDK 提供 with_raw_response）
+    if raw is None and hasattr(resp, "_raw_response"):
+        try:
+            raw = resp._raw_response.json()  # 非公开属性，存在就用
+        except Exception:
+            pass
+
+    # 3) 统一从原始字典里找字段
+    if isinstance(raw, dict):
+        ch0 = (raw.get("choices") or [{}])[0]
+        msg = ch0.get("message") or {}
+        return (
+            msg.get("reasoning")               # OpenRouter 等
+            or msg.get("reasoning_content")    # DashScope 流式聚合后
+            or ch0.get("reasoning")            # 有些提供方放在 choice 层
+        )
+
+    # 4) 兜底：有些模型把 <think> ... </think> 混在 content 里
+    try:
+        import re
+        content = (resp.choices[0].message.content or "")
+        m = re.search(r"<think>(.*?)</think>", content, flags=re.S)
+        return m.group(1).strip() if m else None
+    except Exception:
+        return None
 def run_plan_chat(case_name: str,
                   case_desc: str,
                   context_json: str,
@@ -149,13 +184,15 @@ def run_plan_chat(case_name: str,
             resp = client.chat.completions.create(
                 model=model,
                 messages=messages,
-                response_format={"type": "json_object"},
+                #response_format={"type": "json_object"},
                 temperature=0,   # ★略升温以提升泛化
                 #top_p=0.9          # ★配合采样，仍受系统约束
             )
             txt = resp.choices[0].message.content  
             data = json.loads(txt)
-            print(f"模型输出：{json.dumps(data, ensure_ascii=False, indent=2)}")
+            thinking_content = extract_thinking_from_completion(resp)
+            #print(f"模型输出：{json.dumps(data, ensure_ascii=False, indent=2)}")
+            #print(f"模型思考：{thinking_content}")
             validate(instance=data, schema=PLAN_SCHEMA)
 
             if not check_order_continuity(data["steps"]):
@@ -169,7 +206,7 @@ def run_plan_chat(case_name: str,
                 else:
                     raise ValidationError(
                         f"order 不连续: {[s['order'] for s in data['steps']]}")
-            return data
+            return data,thinking_content
 
         except Exception as e:
             last_err = e
