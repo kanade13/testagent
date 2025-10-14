@@ -62,7 +62,8 @@ case_name: {plan}
 - op:  ["confirm", "edit", "skip", "goto", "stop", "ask"]的其中一个
 - target_step: integer, 当用户想跳转,编辑指定步骤或者询问指定步骤时需要,当用户询问或操作整个case时取值0
 
-- edits: 当 op="edit" 时可能包含的字段 {{action|tool|params|note}}.
+- edits: 当 op="edit" 且target_step不为0时可能包含的字段 {{action|tool|params|note}}.
+当target_step为0时,可能需要调整整体的计划(增加或删除步骤)包含整个case的字段{{case_name|case_desc|type|steps}}.若不修改某字段请置为 null 或不包含该字段。
 请注意理解用户的意思,对于 "params" 字段，必须保持为 **工具实际参数字符串**（例如 "/S 3" → "/S 2"），不要翻译成自然语言。不要增加解释性文字，只能直接修改对应的命令参数。
 如果用户输入模糊，不能确定确切参数值，请保留原值，并在 "message" 中说明问题。
 当 op="edit" 且用户修改了 action（包括更换场景/benchmark 名称）时：
@@ -198,18 +199,30 @@ def stage1_show_and_confirm(client: OpenAI, model: str, plan: Dict[str, Any],log
         elif op == "edit":
             t = cmd.get("target_step", 0)
             edits = cmd.get("edits", {})
-            # 简化：阶段1允许编辑任意步骤（按 order 定位）
-            idx = _find_step_index_by_order(plan, t)
-            if idx is None:
-                print(f"[警告] 未找到步骤 {t}")
-                continue
-            plan["steps"][idx].update({k: v for k, v in edits.items() if v is not None})
-            ok, err = validate_plan(plan,PLAN_SCHEMA)
-            if not ok:
-                print(f"[校验失败] {err}")
+            #如果t不为0
+            if t != 0:
+                idx = _find_step_index_by_order(plan, t)
+                if idx is None:
+                    print(f"[警告] 未找到步骤 {t}")
+                    continue
+                plan["steps"][idx].update({k: v for k, v in edits.items() if v is not None})
+                ok, err = validate_plan(plan,PLAN_SCHEMA)
+                if not ok:
+                    print(f"[校验失败] {err}")
+                else:
+                    print("[已修改并通过校验]")
+                    print(json_pretty(plan["steps"][idx]))
             else:
-                print("[已修改并通过校验]")
-                print(json_pretty(plan["steps"][idx]))
+                #t为0时，编辑整个case
+                for k, v in edits.items():
+                    if k in plan and v is not None:
+                        plan[k] = v
+                ok, err = validate_plan(plan, PLAN_SCHEMA)
+                if not ok:
+                    print(f"[校验失败] {err}")
+                else:
+                    print("[已修改并通过校验]")
+                    print(json_pretty(plan))
 
         elif op in ("skip", "goto"):
             print("[提示] 阶段1仅用于确认/总体编辑，不进行逐步控制。若要跳过/跳转，请进入阶段2后处理。")

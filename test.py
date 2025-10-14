@@ -1,7 +1,7 @@
 import requests
 from main_controller import CONTEXT_JSON
-BASE_URL = "http://localhost:8000/api/v1"
-#BASE_URL = "http://112.29.111.158:20307/api/v1"
+#BASE_URL = "http://localhost:8000/api/v1"
+BASE_URL = "http://112.29.111.158:20307/api/v1"
 
 API_KEY = "ustc"  
 
@@ -18,9 +18,9 @@ def test_run_case():
     url = f"{BASE_URL}/run/case/generate"
     payload = {
         "case_name": "",
-        "case_desc": "利用PXA工具进行3DMark的SteelNormadDX12场景的Stress测试，用窗口模式，测试时长240分钟",
+        "case_desc": "先把机器重启，然后跑Burnin测试30分钟，做1次S4，再跑burnin 30分钟",
         "context_json": "",
-        "model": "qwen3-235b-a22b-thinking-2507",
+        "model": "qwen3-235b-a22b-instruct-2507",
         "max_retries": 3,
         "context": None,
     }
@@ -93,10 +93,11 @@ if __name__ == "__main__":
     test_health()
     plan,thinking=test_run_case()
     print("*****************************************************************************************")
-    print("初始测试计划：", plan)
+    from utils import json_pretty
+    print("初始测试计划：", json_pretty(plan))
     print("*****************************************************************************************")
     print("thinking：", thinking)    
     test_validate_plan(plan)
-    test_parse_command(plan)
+    #test_parse_command(plan)
     print("*****************************************************************************************")
-    test_answer(plan)
+    #test_answer(plan)
