@@ -1,103 +1,54 @@
 import requests
-from main_controller import CONTEXT_JSON
-#BASE_URL = "http://localhost:8000/api/v1"
-BASE_URL = "http://112.29.111.158:20307/api/v1"
 
-API_KEY = "ustc"  
+#BASE_URL = "http://localhost:8000/"
+BASE_URL = "http://112.29.111.158:20307/"
+
+API_KEY = "ustc"
 
 headers = {
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
+
 }
 
 def test_health():
     url = f"{BASE_URL}/healthz"
     resp = requests.get(url, headers=headers)
-    print("Health check:", resp.status_code, resp.json())
+    print("Health check:", resp.status_code, safe_json(resp))
 
 def test_run_case():
-    url = f"{BASE_URL}/run/case/generate"
+    url = f"{BASE_URL}/plan"
     payload = {
-        "case_name": "",
-        "case_desc": "先把机器重启，然后跑Burnin测试30分钟，做1次S4，再跑burnin 30分钟",
-        "context_json": "",
-        "model": "qwen3-235b-a22b-instruct-2507",
-        "max_retries": 3,
-        "context": None,
+        "case_name": "",   
+        "case_desc": "删除最后两个步骤",
+        "user_input":""
     }
-
+    #先把机器重启，然后跑Burnin测试30分钟，做1次S4，再跑burnin 30分钟
     resp = requests.post(url, headers=headers, json=payload)
-    resp.raise_for_status()
-    data = resp.json()
+    print("POST /plan status:", resp.status_code)
+    data = safe_json(resp)
+    if not resp.ok:
+        raise RuntimeError(f"Create/Edit plan failed: {data}")
+    thinking = data.get("thinking") or data.get("thinking_content")
+    plan = data.get("plan")
 
-    if not data.get("ok", False):
-        raise RuntimeError(f"Server returned ok=False: {data}")
+    if plan is None:
+        raise KeyError(f"Response JSON has no 'plan' key. Full body: {data}")
 
-    # 首选规范键名，其次兼容旧错别字（防止线上未同步）
-    thinking = data.get("thinking_content")
-    if thinking is None:
-        thinking = data.get("thingking_content")  # 兼容老返回
-
-    plan = data["plan"]
-
-    #print("Run case:", resp.status_code)
-    #print("thinking:", thinking)
-    #print("plan:", plan)
-    print("*****************************************************************************************")
-    # 视你的调用习惯返回
     return plan, thinking
+def test_clear():
+    resp=requests.post(url=f"{BASE_URL}/plan/clear")
+    print("POST /plan status:", resp.status_code)
+def safe_json(resp):
+    try:
+        return resp.json()
+    except Exception:
+        return {"raw_text": resp.text}
 
-def test_parse_command(plan):
-    url = f"{BASE_URL}/run/case/parse_command"
-    print("Plan to edit:", plan)
-    payload = {
-        "case_name": "",
-        "case_desc": "利用PXA工具进行3DMark的SteelNormadDX12场景的Stress测试，用窗口模式，测试时长240分钟",
-        "context_json": "",
-        "model": "qwen3-235b-a22b-instruct-2507",
-        "max_retries": 3,
-        "context": None,
-        "user_text": "请把第五步改为nightraid场景",
-        "plan": plan
-    }
-    resp = requests.post(url, headers=headers, json=payload)
-    print("Run case:", resp.status_code, resp.json())
-def test_validate_plan(plan):
-    url = f"{BASE_URL}/run/case/validate_plan"
-    payload = {
-        "case_name": "",
-        "case_desc": "利用PXA工具进行3DMark的SteelNormadDX12场景的Stress测试，用窗口模式，测试时长240分钟",
-        "context_json": "",
-        "model": "qwen3-235b-a22b-instruct-2507",
-        "max_retries": 3,
-        "context": None,
-        "plan": plan
-    }
-    resp = requests.post(url, headers=headers, json=payload)
-    print("Validate plan:", resp.status_code, resp.json())
-def test_answer(plan):
-    url = f"{BASE_URL}/run/case/answer"
-    payload = {
-        "case_name": "",
-        "case_desc": "利用PXA工具进行3DMark的SteelNormadDX12场景的Stress测试，用窗口模式，测试时长240分钟",
-        "context_json": "",
-        "model": "qwen3-235b-a22b-instruct-2507",
-        "max_retries": 3,
-        "context": None,
-        "question": "为什么第五步是这样设置的?",
-        "plan": plan,
-        "target_step": 5
-    }
-    resp = requests.post(url, headers=headers, json=payload)
-    print("Answer question:", resp.status_code, resp.json())
 if __name__ == "__main__":
     test_health()
-    plan,thinking=test_run_case()
-    print("*****************************************************************************************")
+    #test_clear()
+    plan, thinking = test_run_case()
     from utils import json_pretty
+    print("thinking：", thinking)
     print("初始测试计划：", json_pretty(plan))
-    print("*****************************************************************************************")
-    print("thinking：", thinking)    
-    test_validate_plan(plan)
-    #test_parse_command(plan)
-    print("*****************************************************************************************")
-    #test_answer(plan)
+
