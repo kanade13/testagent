@@ -1,0 +1,42 @@
+{
+  "case_desc": "先把机器重启，然后跑Burnin测试30分钟，做1次S4，再跑burnin 30分钟",
+  "case_name": "Reboot_Burnin_S4_Burnin_Test",
+  "steps": [
+    {
+      "action": "重启测试机",
+      "note": "需求1: 对应上下文条目：Stress_Burnin_120Min 步骤1；标准重启流程",
+      "order": 1,
+      "params": "--TestFunction Wb --TestTimes 1 --CountDownTime 10 --SleepTime 60 --CheckDeviceMode Nothing /X_SkipShutdown",
+      "tool": "SxPowerTest"
+    },
+    {
+      "action": "安装 BurnInTest 10",
+      "note": "需求2: 对应上下文条目：Stress_Burnin_120Min 步骤2；固定版本安装",
+      "order": 2,
+      "params": "/V 10.2.1015.0",
+      "tool": "BurnIn10Install"
+    },
+    {
+      "action": "运行 BurnInTest 压力测试 30 分钟",
+      "note": "需求2: 对应上下文条目：Stress_Burnin_120Min 步骤4；参数调整为 30 分钟（原120分钟）",
+      "order": 3,
+      "params": "TestTime 30",
+      "tool": "BurnInTestStress"
+    },
+    {
+      "action": "设置 Stress 测试模式",
+      "note": "需求3: 对应上下文条目：Stress_S4_500Cycle 步骤1；启用压力测试环境",
+      "order": 4,
+      "params": "-stress -Restart",
+      "tool": "AutoSet"
+    },
+    {
+      "action": "执行 S4 休眠测试 1 次",
+      "note": "需求3: 对应上下文条目：Stress_S4_500Cycle 步骤2；测试次数调整为 1（原500次）",
+      "order": 5,
+      "params": "--TestFunction S4 --TestTimes 1 --CountDownTime 90 --SleepTime 60 --CheckDeviceMode CheckAll --IgnoredDevices \"Widi Adapter,AX88179,AX88772,Microsoft Wi-Fi Direct Virtual Adapter,Bluetooth Device,Generic PnP Monitor,Lenovo DisplayHDR,Generic Monitor,Realtek(R) USB GbE Family Controller\" /X_Min True",
+      "tool": "OSAgingTool"
+    }
+  ],
+  "type": 1
+}

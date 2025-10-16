@@ -1,35 +1,54 @@
-import asyncio, json
-import websockets
+import requests
 
-WS_URL = "ws://localhost:8000/api/v1/ws/case"
+#BASE_URL = "http://localhost:8000/"
+BASE_URL = "http://112.29.111.158:20307/"
+
 API_KEY = "ustc"
 
-async def main():
-    async with websockets.connect(
-        WS_URL,
-        additional_headers=[("X-API-Key", API_KEY)],  # ← v15 正确写法
-        ping_interval=20,
-        ping_timeout=20,
-        proxy=None,  # 本地开发常见代理坑，建议关掉自动代理
-    ) as ws:
-        print("✅ connected")
-        async def recv():
-            async for msg in ws:
-                try:
-                    print("[SERVER]", json.dumps(json.loads(msg), ensure_ascii=False, indent=2))
-                except Exception:
-                    print("[SERVER TEXT]", msg)
+headers = {
+    "Content-Type": "application/json",
 
-        async def send():
-            while True:
-                line = await asyncio.to_thread(input, "> ")
-                if line.strip().lower() in {"/quit", "/exit"}:
-                    await ws.close(code=1000, reason="client quit")
-                    break
-                await ws.send(line)
+}
 
-        await asyncio.wait({asyncio.create_task(recv()), asyncio.create_task(send())},
-                           return_when=asyncio.FIRST_COMPLETED)
+def test_health():
+    url = f"{BASE_URL}/healthz"
+    resp = requests.get(url, headers=headers)
+    print("Health check:", resp.status_code, safe_json(resp))
+
+def test_run_case():
+    url = f"{BASE_URL}/plan"
+    payload = {
+        "case_name": "",   
+        "case_desc": "删除最后两个步骤",
+        "user_input":""
+    }
+    #先把机器重启，然后跑Burnin测试30分钟，做1次S4，再跑burnin 30分钟
+    resp = requests.post(url, headers=headers, json=payload)
+    print("POST /plan status:", resp.status_code)
+    data = safe_json(resp)
+    if not resp.ok:
+        raise RuntimeError(f"Create/Edit plan failed: {data}")
+    thinking = data.get("thinking") or data.get("thinking_content")
+    plan = data.get("plan")
+
+    if plan is None:
+        raise KeyError(f"Response JSON has no 'plan' key. Full body: {data}")
+
+    return plan, thinking
+def test_clear():
+    resp=requests.post(url=f"{BASE_URL}/plan/clear")
+    print("POST /plan status:", resp.status_code)
+def safe_json(resp):
+    try:
+        return resp.json()
+    except Exception:
+        return {"raw_text": resp.text}
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    test_health()
+    #test_clear()
+    plan, thinking = test_run_case()
+    from utils import json_pretty
+    print("thinking：", thinking)
+    print("初始测试计划：", json_pretty(plan))
+
