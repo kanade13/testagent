@@ -19,7 +19,7 @@ def test_run_case():
     url = f"{BASE_URL}/plan"
     payload = {
         "case_name": "",   
-        "case_desc": "删除最后两个步骤",
+        "case_desc": "先把机器重启，然后跑Burnin测试30分钟，做1次S4，再跑burnin 30分钟",
         "user_input":""
     }
     #先把机器重启，然后跑Burnin测试30分钟，做1次S4，再跑burnin 30分钟

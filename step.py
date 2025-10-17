@@ -237,7 +237,7 @@ def edit_plan_chat(case_name: str,
                    context_json: str=CONTEXT_JSON,
                    model: str = "qwen3-235b-a22b-thinking-2507",
                    max_retries: int = 3) -> tuple[dict[str, Any], str]:
-    SYSTEM_PROMPT = """
+    EDIT_SYSTEM_PROMPT = """
 你是一名“测试计划修改器（Test Planner, Editor）”。
 你的输入将包含三个部分：
 【上下文JSON】：工具清单、示例用法、通用约束；
@@ -317,7 +317,7 @@ def edit_plan_chat(case_name: str,
     #task = json.dumps({"cmd": case_name, "cmd_desc": case_desc}, ensure_ascii=False)
 
     messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "system", "content": EDIT_SYSTEM_PROMPT},
         {"role": "system", "content": "【当前计划为】\n"+ json.dumps(current_plan, ensure_ascii=False, indent=2)},
         {"role": "user", "content": user_context},
         {"role": "user", "content": "【修改需求】\n"+ user_request}
